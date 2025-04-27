@@ -41,35 +41,44 @@ body {
 .tabs {
   display: flex;
   margin-bottom: 15px;
-  background-color: var(--background-light); /* Keep light grey for the bar */
-  border-radius: 8px; /* Keep rounding on the container */
-  padding: 4px; /* Keep padding for inset effect */
+  /* background-color: var(--background-light); */ /* Remove background */
+  border-bottom: 1px solid var(--border-light); /* Add a single bottom border for the whole bar */
+  /* border-radius: 8px; */ /* Remove rounding */
+  /* padding: 4px; */ /* Remove padding */
 }
 
 .tab-button {
   flex-grow: 1;
-  padding: 8px 15px;
+  padding: 10px 15px; /* Adjust padding for border */
   cursor: pointer;
   border: none;
-  color: var(--text-medium);
-  border-radius: 6px; /* Apply rounding to individual buttons for the inset effect */
+  border-bottom: 3px solid transparent; /* Default transparent border */
+  background-color: transparent; /* Ensure transparent background */
+  color: var(--text-medium); /* Default grey text */
+  /* border-radius: 6px; */ /* Remove rounding */
   text-align: center;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition: color 0.2s ease, border-color 0.2s ease; /* Transition color and border */
+  /* box-shadow: none !important; */ /* Ensure no shadow */
 }
 
 .tab-button.active {
   font-weight: 600;
-  color: var(--primary-purple); /* Darker purple text for contrast */
-  background-color: var(--lighter-purple); /* Use the lighter purple background */
+  color: var(--primary-purple); /* Purple text for active */
+  border-bottom-color: var(--primary-purple); /* Purple border for active */
+  background-color: transparent; /* Ensure transparent background */
 }
 
 .tab-button:not(.active) {
-    background-color: transparent; /* Ensure inactive is transparent */
+    /* Remove specific inactive styles */
+    /* background-color: var(--background-white); */
+    /* box-shadow: 0 1px 2px rgba(0,0,0,0.05); */
 }
 
 .tab-button:not(.active):hover {
-  color: var(--primary-purple);
-  background-color: rgba(255, 255, 255, 0.5); /* Subtle white hover for inactive */
+  color: var(--primary-purple); /* Purple text on hover */
+  border-bottom-color: var(--light-purple); /* Lighter purple border on hover */
+  background-color: transparent; /* Ensure transparent background */
+  /* box-shadow: none; */
 }
 
 .tab-content {
@@ -178,6 +187,7 @@ button:focus {
 }
 
 #contacts input[type="text"],
+#contacts input[type="url"],
 #contacts input[type="email"] {
   width: calc(100% - 24px); /* Account for padding and border */
   padding: 10px;
@@ -189,6 +199,7 @@ button:focus {
 }
 
 #contacts input[type="text"]:focus,
+#contacts input[type="url"]:focus,
 #contacts input[type="email"]:focus {
   outline: none;
   border-color: var(--primary-purple);
@@ -371,3 +382,4 @@ body.editing-links .edit-mode-inactive {
 body:not(.editing-links) .edit-mode-active {
     display: none !important; /* Hide edit elements in display mode */
 }
+
