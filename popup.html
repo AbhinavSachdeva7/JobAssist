@@ -2,93 +2,113 @@
 <html>
 <head>
   <title>Job Application Helper</title>
-  <link rel="stylesheet" href="bootstrap.min.css"> <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
+  <!-- Header section -->
+  <header class="app-header">
+    <h1 class="app-title">Job Application Helper</h1>
+  </header>
 
+  <!-- Tab navigation -->
   <div class="tabs">
     <button class="tab-button active" data-tab="quick-links">Quick Links</button>
     <button class="tab-button" data-tab="contacts">Contacts</button>
   </div>
 
-  <div id="quick-links" class="tab-content active">
-    <div class="edit-controls">
-      <button id="edit-links-button" class="icon-button edit-mode-inactive">
-        <!-- Replaced img with inline SVG - Adjusted size -->
-        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-pencil-fill" viewBox="0 0 16 16">
-          <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"/>
-        </svg> 
-        Edit
-      </button>
-      <button id="save-links-button" class="icon-button edit-mode-active">Save</button>
-      <button id="cancel-edit-links-button" class="icon-button edit-mode-active">Cancel</button>
-    </div>
+  <!-- Container for all content -->
+  <div class="app-container">
+    <!-- Quick Links Tab -->
+    <div id="quick-links" class="tab-content active">
+      <div class="edit-controls">
+        <button id="edit-links-button" class="icon-button edit-mode-inactive">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"/>
+          </svg>
+          Edit
+        </button>
+        <button id="save-links-button" class="icon-button edit-mode-active">Save</button>
+        <button id="cancel-edit-links-button" class="icon-button edit-mode-active">Cancel</button>
+      </div>
 
-    <!-- Link Display (Replaced buttons with divs) -->
-    <div class="links-display edit-mode-inactive">
-      <div id="linkedin-link" class="link-item" data-link-key="linkedin">
-        <img src="linkedin.svg" alt="LinkedIn Logo" class="link-logo">
-        <div class="link-text">
-          <span class="link-title">LinkedIn</span>
-          <span class="link-url"></span> <!-- URL will be populated by JS -->
+      <!-- Link Display -->
+      <div class="links-display edit-mode-inactive">
+        <div id="linkedin-link" class="link-item" data-link-key="linkedin">
+          <img src="linkedin.svg" alt="LinkedIn Logo" class="link-logo">
+          <div class="link-text">
+            <span class="link-title">LinkedIn</span>
+            <span class="link-url"></span>
+          </div>
+        </div>
+        <div id="website-link" class="link-item" data-link-key="website">
+          <img src="globe-americas.svg" alt="Website Logo" class="link-logo">
+          <div class="link-text">
+            <span class="link-title">Personal Website</span>
+            <span class="link-url"></span>
+          </div>
+        </div>
+        <div id="github-link" class="link-item" data-link-key="github">
+          <img src="github.svg" alt="GitHub Logo" class="link-logo">
+          <div class="link-text">
+            <span class="link-title">GitHub</span>
+            <span class="link-url"></span>
+          </div>
         </div>
       </div>
-      <div id="website-link" class="link-item" data-link-key="website">
-        <img src="globe-americas.svg" alt="Website Logo" class="link-logo">
-        <div class="link-text">
-          <span class="link-title">Personal Website</span>
-          <span class="link-url"></span> <!-- URL will be populated by JS -->
+
+      <!-- Link Edit Inputs -->
+      <div class="links-edit edit-mode-active">
+        <div class="form-group">
+          <label for="linkedin-edit">LinkedIn URL</label>
+          <input type="url" id="linkedin-edit" placeholder="https://linkedin.com/in/yourprofile">
         </div>
-      </div>
-      <div id="github-link" class="link-item" data-link-key="github">
-        <img src="github.svg" alt="GitHub Logo" class="link-logo">
-        <div class="link-text">
-          <span class="link-title">GitHub</span>
-          <span class="link-url"></span> <!-- URL will be populated by JS -->
+        <div class="form-group">
+          <label for="website-edit">Website URL</label>
+          <input type="url" id="website-edit" placeholder="https://yourwebsite.com">
+        </div>
+        <div class="form-group">
+          <label for="github-edit">GitHub URL</label>
+          <input type="url" id="github-edit" placeholder="https://github.com/yourusername">
         </div>
       </div>
     </div>
 
-    <!-- Link Edit Inputs (Initially Hidden via CSS) -->
-    <div class="links-edit edit-mode-active"> <!-- Removed inline style -->
-      <div class="form-group">
-        <label for="linkedin-edit">LinkedIn URL:</label>
-        <input type="url" id="linkedin-edit" placeholder="https://linkedin.com/in/yourprofile">
-      </div>
-      <div class="form-group">
-        <label for="website-edit">Website URL:</label>
-        <input type="url" id="website-edit" placeholder="https://yourwebsite.com">
-      </div>
-      <div class="form-group">
-        <label for="github-edit">GitHub URL:</label>
-        <input type="url" id="github-edit" placeholder="https://github.com/yourusername">
-      </div>
-    </div>
-  </div>
-
-  <div id="contacts" class="tab-content">
-    <button id="show-add-contact-form">Add New Contact</button> <!-- New button to show form -->
-    <div id="add-contact-form" style="display: none;"> <!-- Form container, initially hidden -->
+    <!-- Contacts Tab -->
+    <div id="contacts" class="tab-content">
+      <button id="show-add-contact-form" class="btn btn-primary">Add New Contact</button>
+      
+      <div id="add-contact-form" style="display: none;">
         <h3>Add New Contact</h3>
-        <input type="text" id="contact-name" placeholder="Name">
-        <input type="email" id="contact-email" placeholder="Email">
-        <input type="text" id="contact-employer" placeholder="Employer (Optional)">
-        <input type="url" id="contact-url" placeholder="LinkedIn/Website URL (Optional)">
-        <button id="save-contact-button">Save</button> <!-- Renamed button -->
-    </div>
-    <hr>
-    <h3>Saved Contacts</h3>
-    <div class="delete-all-container"> <!-- Added wrapper div -->
-        <button id="delete-all-contacts" class="delete-button">Delete All</button>
-    </div>
-    <div id="contacts-list">
-      <!-- Contacts will be loaded here by JS -->
+        <div class="form-group">
+          <input type="text" id="contact-name" placeholder="Name">
+        </div>
+        <div class="form-group">
+          <input type="email" id="contact-email" placeholder="Email">
+        </div>
+        <div class="form-group">
+          <input type="text" id="contact-employer" placeholder="Employer (Optional)">
+        </div>
+        <div class="form-group">
+          <input type="url" id="contact-url" placeholder="LinkedIn/Website URL (Optional)">
+        </div>
+        <button id="save-contact-button" class="btn btn-primary">Save Contact</button>
+      </div>
+
+      <hr>
+      
+      <div class="contacts-header">
+        <h3>Saved Contacts</h3>
+        <div class="delete-all-container">
+          <button id="delete-all-contacts" class="btn-danger btn-sm">Delete All</button>
+        </div>
+      </div>
+      
+      <div id="contacts-list">
+        <!-- Contacts will be loaded here by JS -->
+      </div>
     </div>
   </div>
 
-  <!-- Optional: Bootstrap JS if needed for components -->
-  <!-- <script src="bootstrap.bundle.min.js"></script> -->
   <script src="popup.js"></script>
 </body>
 </html>

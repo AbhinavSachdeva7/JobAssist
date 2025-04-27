@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', function() {
       
       // Change background to provide visual feedback
       const originalBg = element.style.backgroundColor;
-      element.style.backgroundColor = 'var(--lighter-purple)';
+      element.style.backgroundColor = 'var(--background)';
       
       // Remove animation and class after animations complete
       setTimeout(() => {
@@ -86,12 +86,12 @@ document.addEventListener('DOMContentLoaded', function() {
         // Remove the class after the animation completes
         setTimeout(() => {
           element.classList.remove('copied-feedback');
-        }, 1500); // Match fadeInOut animation duration
+        }, 1200); // Match fadeInOut animation duration
       }, 750);
     }).catch(err => {
       console.error('Failed to copy text: ', err);
-      const originalBorder = element.style.borderColor; // Use border for error
-      element.style.border = '1px solid var(--danger-red)';
+      const originalBorder = element.style.borderColor; 
+      element.style.border = '1px solid var(--danger)';
        setTimeout(() => {
         element.style.border = originalBorder || 'none'; // Revert border
       }, 1500);
@@ -211,17 +211,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
      const contactDiv = document.createElement('div');
      contactDiv.setAttribute('data-contact-email', email);
-     // Update innerHTML to include employer, URL, and a Delete button
+     // Update innerHTML to match our new design
      contactDiv.innerHTML = `
         <span class="contact-info">
-            <strong>${name}</strong><br>
+            <strong>${name}</strong>
             <span>${email}</span>
-            ${employer ? `<br><span class=\"contact-employer\">Employer: ${employer}</span>` : ''}
-            ${url ? `<br><a href=\"${url}\" target=\"_blank\" class=\"contact-url\">Link</a>` : ''}
+            ${employer ? `<span class="contact-employer">Employer: ${employer}</span>` : ''}
+            ${url ? `<a href="${url}" target="_blank" class="contact-url">View Profile</a>` : ''}
         </span>
-        <div class="contact-actions"> <!-- Wrapper for buttons -->
-            <button class=\"email-button\" data-email=\"${email}\" title=\"Email ${name}\">Email</button>
-            <button class=\"delete-button\" data-email=\"${email}\" title=\"Delete ${name}\">Delete</button> <!-- Added Delete button -->
+        <div class="contact-actions">
+            <button class="email-button" data-email="${email}" title="Email ${name}">Email</button>
+            <button class="delete-button" data-email="${email}" title="Delete ${name}">Delete</button>
         </div>
      `;
 

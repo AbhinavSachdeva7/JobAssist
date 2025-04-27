@@ -1,135 +1,214 @@
 :root {
-  --primary-purple: #6a0dad;
-  --light-purple: #8a2be2;
-  --lighter-purple: #f2e6ff;
-  --dark-purple: #4c0a7d;
-  --text-dark: #333333;
-  --text-medium: #555555;
-  --text-light: #777777;
-  --border-light: #e0e0e0;
-  --border-medium: #cccccc;
-  --background-light: #f9f9f9;
-  --background-white: #ffffff;
-  --danger-red: #dc3545;
-  --danger-red-dark: #c82333;
+  /* Modern color palette */
+  --primary: #4361EE;
+  --primary-light: #4CC9F0;
+  --primary-dark: #3A0CA3;
+  --accent: #F72585;
+  --success: #06D6A0;
+  --warning: #FFD166;
+  --danger: #EF476F;
+  --text: #2B2D42;
+  --text-light: #8D99AE;
+  --background: #FFFFFF;
+  --background-light: #F8F9FA;
+  --background-dark: #EDF2F7;
+  --border: #E2E8F0;
+  --shadow: rgba(0, 0, 0, 0.1);
+  
+  /* Add these for backward compatibility with your JS file */
+  --lighter-purple: rgba(67, 97, 238, 0.1);
+  --danger-red: #EF476F;
 }
 
-/* Define the Poppins font */
-@font-face {
-  font-family: 'Poppins';
-  src: url('fonts/Poppins-Regular.woff2') format('woff2'); /* Path to your local font file */
-  font-weight: 400;
-  font-style: normal;
+/* Typography - Direct import for Chrome extensions */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-@font-face {
-  font-family: 'Poppins';
-  src: url('fonts/Poppins-Bold.woff2') format('woff2'); /* Path to your local bold font file */
-  font-weight: 700;
-  font-style: normal;
+html, body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--text);
+  background-color: var(--background);
 }
 
-html,
 body {
-  background-color: var(--background-white); /* Ensure white background */
+  width: 360px;
+  min-height: 300px;
+  padding: 0;
+  overflow-x: hidden;
 }
 
-body {
-  font-family: 'Poppins', sans-serif;
-  width: 350px;
-  padding: 15px;
-  color: var(--text-dark);
-  font-size: 14px; /* Slightly smaller base font size */
+/* Header and App Container */
+.app-header {
+  background-color: var(--primary);
+  padding: 15px 20px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+.app-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: white;
+  margin: 0;
+}
+
+.app-container {
+  padding: 16px;
+}
+
+/* Tabs Design */
 .tabs {
   display: flex;
-  margin-bottom: 15px;
-  /* background-color: var(--background-light); */ /* Remove background */
-  border-bottom: 1px solid var(--border-light); /* Add a single bottom border for the whole bar */
-  /* border-radius: 8px; */ /* Remove rounding */
-  /* padding: 4px; */ /* Remove padding */
+  background-color: var(--background);
+  border-bottom: 1px solid var(--border);
+  padding: 0;
+  margin: 0;
 }
 
 .tab-button {
-  flex-grow: 1;
-  padding: 10px 15px; /* Adjust padding for border */
-  cursor: pointer;
+  flex: 1;
+  padding: 12px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-light);
+  background-color: transparent;
   border: none;
-  border-bottom: 3px solid transparent; /* Default transparent border */
-  background-color: transparent; /* Ensure transparent background */
-  color: var(--text-medium); /* Default grey text */
-  /* border-radius: 6px; */ /* Remove rounding */
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
   text-align: center;
-  transition: color 0.2s ease, border-color 0.2s ease; /* Transition color and border */
-  /* box-shadow: none !important; */ /* Ensure no shadow */
+  margin-bottom: 0;
+}
+
+.tab-button::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background-color: transparent;
+  transition: all 0.2s ease;
 }
 
 .tab-button.active {
-  font-weight: 600;
-  color: var(--primary-purple); /* Purple text for active */
-  border-bottom-color: var(--primary-purple); /* Purple border for active */
-  background-color: transparent; /* Ensure transparent background */
+  color: var(--primary);
 }
 
-.tab-button:not(.active):hover {
-  color: var(--primary-purple); /* Purple text on hover */
-  border-bottom-color: var(--light-purple); /* Lighter purple border on hover */
-  background-color: transparent; /* Ensure transparent background */
-  /* box-shadow: none; */
+.tab-button.active::after {
+  background-color: var(--primary);
+}
+
+.tab-button:hover:not(.active) {
+  color: var(--text);
+}
+
+.tab-button:hover:not(.active)::after {
+  background-color: var(--border);
 }
 
 .tab-content {
   display: none;
-  padding-top: 10px;
+  padding: 16px 0 10px;
 }
 
 .tab-content.active {
   display: block;
+  animation: fadeIn 0.3s ease;
 }
 
-/* General button styling */
-button {
-  display: block;
-  width: 100%;
-  padding: 10px 12px;
-  margin-bottom: 10px; /* Increased margin */
-  border: 1px solid var(--border-light); /* Lighter border */
-  border-radius: 6px; /* Slightly more rounded */
-  background-color: var(--background-white);
-  color: var(--text-dark);
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Quick Links Styling */
+.edit-controls {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+}
+
+.link-item {
+  display: flex;
+  align-items: center;
+  padding: 14px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  background-color: var(--background-light);
   cursor: pointer;
-  text-align: left;
-  font-size: 1em;
-  font-family: inherit; /* Ensure font consistency */
-  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  position: relative;
+  overflow: hidden;
 }
 
-button:hover {
-  background-color: var(--lighter-purple);
-  border-color: var(--light-purple);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+.link-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 3px;
+  background-color: var(--primary);
+  opacity: 0;
+  transition: opacity 0.2s ease;
 }
 
-button:focus {
-  outline: none;
-  border-color: var(--primary-purple);
-  box-shadow: 0 0 0 2px rgba(106, 13, 173, 0.2);
+.link-item:hover {
+  background-color: var(--background);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
 }
 
-/* Specific button styling */
-
-/* Remove old button styles for quick links display */
-/*
-#quick-links .links-display button {
-  ...
+.link-item:hover::before {
+  opacity: 1;
 }
-*/
+
+.link-logo {
+  width: 22px;
+  height: 22px;
+  margin-right: 14px;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+}
+
+.link-text {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.link-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 3px;
+}
+
+.link-url {
+  font-size: 12px;
+  color: var(--text-light);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 0.2s ease;
+}
+
+.link-item:hover .link-url {
+  color: var(--primary);
+}
 
 /* Copy animation styles */
 @keyframes copiedAnimation {
   0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
+  50% { transform: scale(1.03); }
   100% { transform: scale(1); }
 }
 
@@ -141,376 +220,320 @@ button:focus {
   content: "Copied!";
   position: absolute;
   top: -30px;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: var(--primary-purple);
+  right: 12px;
+  background-color: var(--primary);
   color: white;
   padding: 5px 10px;
-  border-radius: 4px;
+  border-radius: 6px;
   font-size: 12px;
+  font-weight: 500;
   opacity: 0;
-  animation: fadeInOut 1.5s ease;
+  animation: fadeInOut 1.2s ease;
   pointer-events: none;
+  box-shadow: 0 3px 8px rgba(67, 97, 238, 0.2);
+  z-index: 10;
 }
 
 @keyframes fadeInOut {
-  0% { opacity: 0; top: -20px; }
-  20% { opacity: 1; top: -30px; }
-  80% { opacity: 1; top: -30px; }
-  100% { opacity: 0; top: -20px; }
+  0% { opacity: 0; transform: translateY(5px); }
+  20% { opacity: 1; transform: translateY(0); }
+  80% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-5px); }
 }
 
-/* New Link Item Styles */
-.link-item {
-  display: flex;
-  align-items: center;
-  padding: 8px 10px;
-  margin-bottom: 8px;
-  border-radius: 6px;
-  border: none; /* Remove border */
-  background-color: var(--background-white);
+/* Buttons Styles */
+button {
+  padding: 10px 14px;
+  border: none;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.link-item:hover {
-  background-color: var(--lighter-purple);
-}
-
-.link-logo {
-  width: 20px;
-  height: 20px;
-  margin-right: 12px;
-  flex-shrink: 0; /* Prevent logo from shrinking */
-}
-
-.link-text {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden; /* Prevent text overflow issues */
-}
-
-.link-title {
-  font-weight: 500; /* Medium weight */
-  color: var(--text-dark);
-  font-size: 0.95em;
-  margin-bottom: 2px;
-}
-
-.link-url {
-  font-size: 0.85em;
-  color: var(--text-light); /* Grey color */
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  transition: color 0.2s ease;
-}
-
-.link-item:hover .link-url {
-  color: var(--primary-purple); /* Purple on hover */
-}
-
-#contacts h3 {
-  margin-top: 15px;
-  margin-bottom: 10px; /* Increased margin */
-  font-size: 1.15em; /* Slightly larger */
-  color: var(--text-dark);
-  font-weight: 600; /* Semi-bold */
-}
-
-#contacts input[type="text"],
-#contacts input[type="url"],
-#contacts input[type="email"] {
-  /* width: calc(100% - 24px); */ /* Account for padding and border */
-  width: 100%; /* Make width 100% */
-  box-sizing: border-box; /* Include padding and border in the element's total width */
-  padding: 10px;
-  margin-bottom: 10px;
-  border: 1px solid var(--border-medium);
-  border-radius: 6px;
-  font-size: 1em;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-#contacts input[type="text"]:focus,
-#contacts input[type="url"]:focus,
-#contacts input[type="email"]:focus {
-  outline: none;
-  border-color: var(--primary-purple);
-  box-shadow: 0 0 0 2px rgba(106, 13, 173, 0.2);
-}
-
-#contacts button#show-add-contact-form {
-  background-color: var(--primary-purple); /* Match save button */
-  color: white;
-  border: none;
-  text-align: center; /* Center align text */
-  font-weight: 600;
-  margin-bottom: 15px; /* Add space below */
-}
-
-/* Style the form container if needed */
-#add-contact-form {
-    /* padding: 15px; */ /* Remove padding or adjust as needed */
-    /* border: 1px solid var(--border-light); */ /* Remove border */
-    border-radius: 6px;
-    margin-bottom: 15px;
-    /* background-color: var(--background-light); */ /* Remove background color */
-}
-
-/* Center align the form heading */
-#add-contact-form h3 {
-    text-align: center;
-    margin-bottom: 15px; /* Add some space below heading */
-}
-
-#contacts button#save-contact-button {
-  background-color: var(--primary-purple); /* Restore primary purple background */
-  color: white;
-  border: none;
+  transition: all 0.2s ease;
   text-align: center;
-  font-weight: 600;
-  /* Remove inherited styles from quick links save button */
-  padding: 10px 12px !important; /* Restore original padding */
-  border: none !important; /* Ensure no border */
-}
-#contacts button#save-contact-button:hover {
-  background-color: var(--dark-purple); /* Darken on hover */
-  /* Remove inherited styles */
-  border-color: var(--dark-purple);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  color: white !important; /* Ensure text stays white on hover */
 }
 
-#contacts hr {
-  border: none;
-  border-top: 1px solid var(--border-light);
-  margin: 20px 0;
-}
-
-#contacts-list div {
-  background-color: var(--background-white);
-  padding: 12px;
-  margin-bottom: 8px;
-  border: 1px solid var(--border-light);
-  border-radius: 6px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: none !important; /* Explicitly remove box-shadow */
-  transition: none !important; /* Remove transition if it was related to shadow */
-}
-
-#contacts-list div:hover {
-    box-shadow: none !important; /* Explicitly remove hover box-shadow */
-}
-
-.contact-info {
-    display: inline-block; /* Allow buttons next to it */
-    margin-right: 10px; /* Space between info and buttons */
-    vertical-align: top; /* Align top */
-    max-width: calc(100% - 100px); /* Prevent text from pushing buttons too far */
-    color: var(--text-dark);
-    line-height: 1.4;
-}
-
-.contact-info strong {
-    font-weight: 600;
-}
-
-.contact-info span {
-    font-size: 0.9em;
-    color: var(--text-light);
-}
-
-/* Add this new rule */
-.contact-actions {
-  border: none !important;
-  background-color: transparent !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  box-shadow: none !important;
-}
-
-.email-button {
-  padding: 6px 12px !important;
-  background-color: var(--primary-purple) !important; /* Change to primary purple */
-  color: white !important;
-  border: none !important; /* Explicitly remove border */
-  border-radius: 5px !important;
-  cursor: pointer !important;
-  width: auto !important;
-  text-align: center !important;
-  font-size: 0.9em !important;
-  font-weight: 500 !important;
-  line-height: 1.2 !important; /* Ensure consistent line height */
-  box-shadow: none !important; /* Remove any inherited shadow */
-  transition: background-color 0.2s ease !important;
-  margin-right: 5px; /* Add space between email and delete */
-}
-
-.email-button:hover {
-  background-color: var(--dark-purple) !important; /* Darken on hover */
-  box-shadow: none !important; /* Ensure no shadow on hover either */
-}
-
-.email-button:focus {
-    outline: none !important;
-    box-shadow: 0 0 0 2px rgba(138, 43, 226, 0.3) !important; /* Focus ring with lighter purple */
-}
-
-/* Quick Links Edit Mode Styles */
-.edit-controls {
-  display: flex;
-  justify-content: flex-end; /* Position buttons to the right */
+.btn {
+  width: 100%;
   margin-bottom: 10px;
 }
 
-.icon-button {
-  background: none !important; /* Remove background */
-  border: none !important; /* Remove border */
-  padding: 4px !important; /* Adjust padding */
-  margin-left: 5px !important;
-  cursor: pointer !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  width: auto !important;
-  font-size: 0.9em !important;
-  color: var(--primary-purple) !important; /* Keep text purple */
-  box-shadow: none !important;
-  border-radius: 4px !important; /* Slightly smaller radius */
-  transition: background-color 0.2s ease !important;
+.btn-primary {
+  background-color: var(--primary);
+  color: white;
 }
 
-.icon-button svg { /* Target the inline SVG */
-  width: 12px; /* Match SVG attribute */
-  height: 12px; /* Match SVG attribute */
-  margin-right: 5px; /* Add space between icon and text */
-  vertical-align: middle; /* Align icon vertically with text */
+.btn-primary:hover {
+  background-color: var(--primary-dark);
+  box-shadow: 0 3px 8px rgba(67, 97, 238, 0.25);
+}
+
+/* Icon Button */
+.icon-button {
+  background: none;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  color: var(--primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  width: auto;
+  margin-left: 8px;
+}
+
+.icon-button svg {
+  width: 14px;
+  height: 14px;
+  margin-right: 5px;
 }
 
 .icon-button:hover {
-  text-decoration: none !important;
-  background-color: var(--lighter-purple) !important; /* Add subtle background on hover */
-  /* border-color: var(--light-purple) !important; */ /* No border */
+  background-color: rgba(67, 97, 238, 0.1);
 }
 
-/* Ensure Save/Cancel still look okay with this base style */
-#save-links-button { /* Removed #contacts button#save-contact-button from this rule */
-    /* Add back border/background for save */
-    border: 1px solid var(--primary-purple) !important;
-    background-color: var(--lighter-purple) !important;
-    padding: 5px 8px !important; /* Restore padding */
+#edit-links-button {
+  color: var(--primary);
 }
 
-#save-links-button:hover { /* Removed #contacts button#save-contact-button from this rule */
-    background-color: var(--primary-purple) !important;
-    color: white !important;
+#save-links-button {
+  background-color: var(--primary);
+  color: white;
 }
 
 #cancel-edit-links-button {
-    /* Add back border/background for cancel */
-    border: 1px solid var(--border-medium) !important;
-    background-color: var(--background-white) !important;
-    color: var(--text-medium) !important;
-    padding: 5px 8px !important; /* Restore padding */
+  color: var(--text-light);
 }
 
-#cancel-edit-links-button:hover {
-    background-color: var(--background-light) !important;
-    color: var(--danger-red) !important;
-    border-color: var(--danger-red) !important;
+/* Forms */
+.form-group {
+  margin-bottom: 14px;
 }
 
-.links-edit .form-group {
-  margin-bottom: 15px; /* Increased spacing between fields */
-}
-
-.links-edit label {
+label {
   display: block;
-  margin-bottom: 5px; /* Increased space below label */
-  font-size: 0.9em;
-  color: var(--text-medium);
-  font-weight: 500; /* Slightly bolder label */
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
 }
 
-.links-edit input[type="url"] {
-  width: calc(100% - 24px); /* Consistent width accounting for padding/border */
-  padding: 10px; /* Match contact input padding */
-  border: 1px solid var(--border-medium);
-  border-radius: 6px; /* Match contact input radius */
-  font-size: 1em; /* Match contact input font size */
-  font-family: inherit; /* Ensure consistent font */
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+input[type="text"],
+input[type="email"],
+input[type="url"] {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--text);
+  background-color: var(--background);
+  transition: all 0.2s ease;
 }
 
-.links-edit input[type="url"]:focus {
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="url"]:focus {
   outline: none;
-  border-color: var(--primary-purple);
-  box-shadow: 0 0 0 2px rgba(106, 13, 173, 0.2); /* Consistent focus shadow */
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.15);
+}
+
+/* Contacts Section */
+#show-add-contact-form {
+  background-color: var(--primary);
+  color: white;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.contacts-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.contacts-header h3 {
+  margin: 0;
+}
+
+#contacts h3 {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+#add-contact-form {
+  background-color: var(--background-light);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+#add-contact-form h3 {
+  text-align: center;
+  margin-bottom: 14px;
+}
+
+#save-contact-button {
+  background-color: var(--primary);
+  color: white;
+  width: 100%;
+  text-align: center;
+  margin-top: 6px;
+}
+
+hr {
+  border: none;
+  height: 1px;
+  background-color: var(--border);
+  margin: 16px 0;
+}
+
+/* Contact List */
+.delete-all-container {
+  display: flex;
+  justify-content: flex-end;
+}
+
+#delete-all-contacts {
+  background-color: transparent;
+  color: var(--danger);
+  border: 1px solid var(--danger);
+  padding: 6px 10px;
+  font-size: 12px;
+  border-radius: 6px;
+  width: auto;
+}
+
+#delete-all-contacts:hover {
+  background-color: var(--danger);
+  color: white;
+}
+
+#contacts-list div {
+  background-color: var(--background-light);
+  padding: 14px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
+}
+
+#contacts-list div:hover {
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+.contact-info {
+  flex: 1;
+  margin-right: 12px;
+}
+
+.contact-info strong {
+  font-weight: 600;
+  font-size: 14px;
+  display: block;
+  margin-bottom: 3px;
+  color: var(--text);
+}
+
+.contact-info span {
+  font-size: 12px;
+  color: var(--text-light);
+  display: block;
+  margin-bottom: 2px;
+}
+
+.contact-employer {
+  font-style: italic;
+}
+
+.contact-url {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 12px;
+  display: inline-block;
+  margin-top: 2px;
+}
+
+.contact-url:hover {
+  text-decoration: underline;
+}
+
+.contact-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.email-button, 
+.delete-button {
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  width: auto;
+  text-align: center;
+}
+
+.email-button {
+  background-color: var(--primary);
+  color: white;
+  border: none;
+}
+
+.email-button:hover {
+  background-color: var(--primary-dark);
+}
+
+.delete-button {
+  background-color: transparent;
+  color: var(--danger);
+  border: 1px solid var(--danger);
+}
+
+.delete-button:hover {
+  background-color: var(--danger);
+  color: white;
 }
 
 /* Hide elements based on mode */
 body.editing-links .edit-mode-inactive {
-    display: none !important; /* Hide display elements in edit mode */
+  display: none;
 }
 
 body:not(.editing-links) .edit-mode-active {
-    display: none !important; /* Hide edit elements in display mode */
+  display: none;
 }
 
-/* Add this to popup.css for basic styling of the delete buttons */
-.delete-button {
-  background-color: var(--background-white) !important; /* Match background */
-  color: var(--danger-red) !important; /* Red text */
-  border: 1px solid var(--danger-red) !important; /* Red border */
-  padding: 5px 11px !important; /* Adjust padding slightly for border */
-  border-radius: 5px !important; /* Match email button radius */
-  cursor: pointer !important;
-  font-size: 0.9em !important; /* Match email button font size */
-  font-weight: 500 !important; /* Match email button font weight */
-  line-height: 1.2 !important; /* Match email button line height */
-  margin-left: 0px !important;
-  vertical-align: middle !important;
-  width: auto !important;
-  text-align: center !important;
-  box-shadow: none !important;
-  transition: background-color 0.2s ease, color 0.2s ease !important;
+/* Animation for no contacts message */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.delete-button:hover {
-  background-color: var(--danger-red) !important; /* Red background on hover */
-  color: white !important; /* White text on hover */
-}
-
-/* New wrapper for Delete All button */
-.delete-all-container {
-  display: flex;
-  justify-content: flex-end; /* Align button to the right */
-  margin-bottom: 10px; /* Keep the space below the button */
-}
-
-#delete-all-contacts {
-  /* display: block; */ /* No longer needed */
-  /* margin-left: auto; */ /* No longer needed */
-  margin-right: 0; /* Ensure no extra right margin */
-  /* margin-bottom: 10px; */ /* Moved to container */
-  background-color: var(--background-white); /* Match background */
-  color: var(--danger-red); /* Red text */
-  border: 1px solid var(--danger-red); /* Red border */
-  padding: 4px 9px; /* Adjust padding slightly for border */
-  width: auto;
-  max-width: fit-content;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 0.9em;
-  font-weight: 500;
-  line-height: 1.2;
-  transition: background-color 0.2s ease, color 0.2s ease; /* Add transition */
-}
-
-#delete-all-contacts:hover {
-  background-color: var(--danger-red); /* Red background on hover */
-  color: white; /* White text on hover */
+#contacts-list p {
+  text-align: center;
+  padding: 16px;
+  color: var(--text-light);
+  font-style: italic;
+  animation: fadeInUp 0.5s ease;
 }
 
