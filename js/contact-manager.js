@@ -73,11 +73,11 @@ const ContactManager = {
     const contactDiv = document.createElement('div');
     contactDiv.setAttribute('data-contact-email', email);
     
-    // Add inline styles to ensure no border or shadow appears
+    // Add inline styles to ensure no border or shadow appears, with a light background color
     contactDiv.style.padding = '16px';
     contactDiv.style.marginBottom = '12px';
     contactDiv.style.borderRadius = '10px';
-    contactDiv.style.backgroundColor = 'white';
+    contactDiv.style.backgroundColor = '#f9f5ff'; // Light purple background for better visibility
     contactDiv.style.boxShadow = '0 1px 4px rgba(0, 0, 0, 0.05)';
     contactDiv.style.border = 'none';
     
@@ -85,7 +85,7 @@ const ContactManager = {
       <strong class="contact-name">${name}</strong>
       <span class="contact-email">${email}</span>
       ${employer ? `<span class="contact-employer">Employer: ${employer}</span>` : ''}
-      ${url ? `<a href="${url}" target="_blank" class="contact-url">View Profile</a>` : ''}
+      ${url ? `<span class="copyable-url" data-url="${url}" style="cursor: pointer; color: var(--primary); font-size: 12px; display: block; margin-top: 4px; margin-bottom: 4px; width: fit-content; text-decoration: none; transition: all 0.2s ease;">${url}</span>` : ''}
       <div style="display: flex; gap: 10px; margin-top: 10px; border: none; background: transparent; box-shadow: none; padding: 0;">
         <button class="email-button" data-email="${email}" title="Email ${name}" style="flex: 1; max-width: 80px;">Email</button>
         <button class="delete-button" data-email="${email}" title="Delete ${name}" style="flex: 1; max-width: 80px;">Delete</button>
@@ -103,6 +103,48 @@ const ContactManager = {
       const emailToDelete = e.target.getAttribute('data-email');
       this.deleteContact(emailToDelete);
     });
+
+    // Set up URL copy functionality if URL exists
+    if (url) {
+      const urlElement = contactDiv.querySelector('.copyable-url');
+      urlElement.addEventListener('click', (e) => {
+        const urlToCopy = e.target.getAttribute('data-url');
+        
+        // Copy to clipboard
+        navigator.clipboard.writeText(urlToCopy).then(() => {
+          // Store original text and URL
+          const originalText = e.target.textContent;
+          
+          // Change text to "Copied!"
+          e.target.textContent = "Copied!";
+          e.target.style.color = "#4caf50"; // Green color
+          
+          // Add a subtle animation
+          e.target.style.transition = "all 0.2s ease";
+          e.target.style.transform = "scale(1.05)";
+          
+          // Revert back after 1.5 seconds
+          setTimeout(() => {
+            e.target.textContent = originalText;
+            e.target.style.color = "";
+            e.target.style.transform = "scale(1)";
+          }, 1500);
+        }).catch(err => {
+          console.error('Failed to copy: ', err);
+        });
+      });
+      
+      // Add hover effect
+      urlElement.addEventListener('mouseenter', (e) => {
+        e.target.style.color = "var(--primary-dark)";
+        e.target.style.textDecoration = "underline";
+      });
+      
+      urlElement.addEventListener('mouseleave', (e) => {
+        e.target.style.color = "var(--primary)";
+        e.target.style.textDecoration = "none";
+      });
+    }
 
     this.contactsListDiv.appendChild(contactDiv);
   },
