@@ -73,16 +73,22 @@ const ContactManager = {
     const contactDiv = document.createElement('div');
     contactDiv.setAttribute('data-contact-email', email);
     
+    // Add inline styles to ensure no border or shadow appears
+    contactDiv.style.padding = '16px';
+    contactDiv.style.marginBottom = '12px';
+    contactDiv.style.borderRadius = '10px';
+    contactDiv.style.backgroundColor = 'white';
+    contactDiv.style.boxShadow = '0 1px 4px rgba(0, 0, 0, 0.05)';
+    contactDiv.style.border = 'none';
+    
     contactDiv.innerHTML = `
-      <span class="contact-info">
-        <strong>${name}</strong>
-        <span>${email}</span>
-        ${employer ? `<span class="contact-employer">Employer: ${employer}</span>` : ''}
-        ${url ? `<a href="${url}" target="_blank" class="contact-url">View Profile</a>` : ''}
-      </span>
-      <div class="contact-actions">
-        <button class="email-button" data-email="${email}" title="Email ${name}">Email</button>
-        <button class="delete-button" data-email="${email}" title="Delete ${name}">Delete</button>
+      <strong class="contact-name">${name}</strong>
+      <span class="contact-email">${email}</span>
+      ${employer ? `<span class="contact-employer">Employer: ${employer}</span>` : ''}
+      ${url ? `<a href="${url}" target="_blank" class="contact-url">View Profile</a>` : ''}
+      <div style="display: flex; gap: 10px; margin-top: 10px; border: none; background: transparent; box-shadow: none; padding: 0;">
+        <button class="email-button" data-email="${email}" title="Email ${name}" style="flex: 1; max-width: 80px;">Email</button>
+        <button class="delete-button" data-email="${email}" title="Delete ${name}" style="flex: 1; max-width: 80px;">Delete</button>
       </div>
     `;
 
@@ -123,7 +129,10 @@ const ContactManager = {
     contacts = contacts.filter(contact => contact.email !== emailToDelete);
     
     await chrome.storage.local.set({ [this.STORAGE_KEY]: contacts });
-    this.showToast('Contact deleted');
+    
+    // Show the contact deleted animation instead of the toast
+    this.showContactDeletedAnimation();
+    
     this.loadContacts();
   },
   
@@ -183,13 +192,19 @@ const ContactManager = {
       // Hide form and show add button
       this.addContactFormDiv.style.display = 'none';
       this.showAddContactFormButton.style.display = 'block';
+      
+      // Show the contact saved animation
+      this.showContactSavedAnimation();
     }
   },
   
   async handleDeleteAll() {
     if (confirm('Are you sure you want to delete ALL contacts? This cannot be undone.')) {
       await chrome.storage.local.remove(this.STORAGE_KEY);
-      this.showToast('All contacts deleted');
+      
+      // Show the contact deleted animation instead of the toast
+      this.showContactDeletedAnimation();
+      
       this.loadContacts();
     }
   },
@@ -204,6 +219,38 @@ const ContactManager = {
     // Hide form and show add button
     this.addContactFormDiv.style.display = 'none';
     this.showAddContactFormButton.style.display = 'block';
+  },
+
+  // Helper for showing contact deleted animation
+  showContactDeletedAnimation() {
+    const animationBar = document.getElementById('contact-deleted-animation');
+    const feedbackPopup = document.getElementById('contact-deleted-feedback');
+    
+    // Show animation elements
+    animationBar.classList.add('show');
+    feedbackPopup.classList.add('show');
+    
+    // Hide animation elements after 2 seconds
+    setTimeout(() => {
+      animationBar.classList.remove('show');
+      feedbackPopup.classList.remove('show');
+    }, 2000);
+  },
+
+  // Helper for showing contact saved animation
+  showContactSavedAnimation() {
+    const animationBar = document.getElementById('contact-saved-animation');
+    const feedbackPopup = document.getElementById('contact-saved-feedback');
+    
+    // Show animation elements
+    animationBar.classList.add('show');
+    feedbackPopup.classList.add('show');
+    
+    // Hide animation elements after 2 seconds
+    setTimeout(() => {
+      animationBar.classList.remove('show');
+      feedbackPopup.classList.remove('show');
+    }, 2000);
   },
 
   // Helper for showing toast messages - disabled as requested
