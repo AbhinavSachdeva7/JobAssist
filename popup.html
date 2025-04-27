@@ -13,9 +13,52 @@
   </div>
 
   <div id="quick-links" class="tab-content active">
-    <button id="linkedin"><img src="linkedin.svg" alt="LinkedIn Logo"> LinkedIn</button>
-    <button id="website"><img src="globe-americas.svg" alt="Website Logo"> Personal Website</button>
-    <button id="github"><img src="github.svg" alt="GitHub Logo"> GitHub</button>
+    <div class="edit-controls">
+      <button id="edit-links-button" class="icon-button edit-mode-inactive"><img src="pencil-fill.svg" alt="Edit"> Edit</button>
+      <button id="save-links-button" class="icon-button edit-mode-active">Save</button> <!-- Removed inline style -->
+      <button id="cancel-edit-links-button" class="icon-button edit-mode-active">Cancel</button> <!-- Removed inline style -->
+    </div>
+
+    <!-- Link Display (Replaced buttons with divs) -->
+    <div class="links-display edit-mode-inactive">
+      <div id="linkedin-link" class="link-item" data-link-key="linkedin">
+        <img src="linkedin.svg" alt="LinkedIn Logo" class="link-logo">
+        <div class="link-text">
+          <span class="link-title">LinkedIn</span>
+          <span class="link-url"></span> <!-- URL will be populated by JS -->
+        </div>
+      </div>
+      <div id="website-link" class="link-item" data-link-key="website">
+        <img src="globe-americas.svg" alt="Website Logo" class="link-logo">
+        <div class="link-text">
+          <span class="link-title">Personal Website</span>
+          <span class="link-url"></span> <!-- URL will be populated by JS -->
+        </div>
+      </div>
+      <div id="github-link" class="link-item" data-link-key="github">
+        <img src="github.svg" alt="GitHub Logo" class="link-logo">
+        <div class="link-text">
+          <span class="link-title">GitHub</span>
+          <span class="link-url"></span> <!-- URL will be populated by JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Link Edit Inputs (Initially Hidden via CSS) -->
+    <div class="links-edit edit-mode-active"> <!-- Removed inline style -->
+      <div class="form-group">
+        <label for="linkedin-edit">LinkedIn URL:</label>
+        <input type="url" id="linkedin-edit" placeholder="https://linkedin.com/in/yourprofile">
+      </div>
+      <div class="form-group">
+        <label for="website-edit">Website URL:</label>
+        <input type="url" id="website-edit" placeholder="https://yourwebsite.com">
+      </div>
+      <div class="form-group">
+        <label for="github-edit">GitHub URL:</label>
+        <input type="url" id="github-edit" placeholder="https://github.com/yourusername">
+      </div>
+    </div>
   </div>
 
   <div id="contacts" class="tab-content">

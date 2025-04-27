@@ -105,15 +105,62 @@ button:focus {
 }
 
 /* Specific button styling */
-#quick-links button {
+
+/* Remove old button styles for quick links display */
+/*
+#quick-links .links-display button {
+  ...
+}
+*/
+
+/* New Link Item Styles */
+.link-item {
   display: flex;
   align-items: center;
+  padding: 8px 10px;
+  margin-bottom: 8px;
+  border-radius: 6px;
+  border: none; /* Remove border */
+  background-color: var(--background-white);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
-#quick-links button img {
-  margin-right: 10px; /* Increased space */
-  width: 18px;
-  height: 18px;
+.link-item:hover {
+  background-color: var(--lighter-purple);
+}
+
+.link-logo {
+  width: 20px;
+  height: 20px;
+  margin-right: 12px;
+  flex-shrink: 0; /* Prevent logo from shrinking */
+}
+
+.link-text {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Prevent text overflow issues */
+}
+
+.link-title {
+  font-weight: 500; /* Medium weight */
+  color: var(--text-dark);
+  font-size: 0.95em;
+  margin-bottom: 2px;
+}
+
+.link-url {
+  font-size: 0.85em;
+  color: var(--text-light); /* Grey color */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 0.2s ease;
+}
+
+.link-item:hover .link-url {
+  color: var(--primary-purple); /* Purple on hover */
 }
 
 #contacts h3 {
@@ -217,4 +264,96 @@ button:focus {
 .email-button:focus {
     outline: none !important;
     box-shadow: 0 0 0 2px rgba(138, 43, 226, 0.3) !important; /* Focus ring with lighter purple */
+}
+
+/* Quick Links Edit Mode Styles */
+.edit-controls {
+  display: flex;
+  justify-content: flex-end; /* Position buttons to the right */
+  margin-bottom: 10px;
+}
+
+.icon-button {
+  background: none !important;
+  border: 1px solid var(--border-light) !important; /* Add a light border */
+  padding: 5px 8px !important; /* Adjust padding */
+  margin-left: 5px !important;
+  cursor: pointer !important;
+  display: inline-flex !important; /* Align icon and text */
+  align-items: center !important;
+  width: auto !important; /* Override general button width */
+  font-size: 0.9em !important;
+  color: var(--primary-purple) !important;
+  box-shadow: none !important;
+}
+
+.icon-button img {
+  width: 14px;
+  height: 14px;
+  margin-right: 4px;
+}
+
+.icon-button:hover {
+  text-decoration: none !important; /* Remove underline on hover */
+  background-color: var(--lighter-purple) !important; /* Add hover background */
+  border-color: var(--light-purple) !important;
+}
+
+#save-links-button {
+    /* Use theme colors */
+    color: var(--primary-purple) !important;
+    border-color: var(--primary-purple) !important;
+    background-color: var(--lighter-purple) !important;
+}
+
+#save-links-button:hover {
+    background-color: var(--primary-purple) !important;
+    color: white !important;
+}
+
+#cancel-edit-links-button {
+    /* Use theme colors */
+    color: var(--text-medium) !important;
+    border-color: var(--border-medium) !important;
+    background-color: var(--background-white) !important;
+}
+
+#cancel-edit-links-button:hover {
+    background-color: var(--background-light) !important;
+    color: var(--danger-red) !important;
+    border-color: var(--danger-red) !important;
+}
+
+.links-edit .form-group {
+  margin-bottom: 10px;
+}
+
+.links-edit label {
+  display: block;
+  margin-bottom: 3px;
+  font-size: 0.9em;
+  color: var(--text-medium);
+}
+
+.links-edit input[type="url"] {
+  width: calc(100% - 22px); /* Match other inputs */
+  padding: 8px;
+  border: 1px solid var(--border-medium);
+  border-radius: 4px;
+  font-size: 0.95em;
+}
+
+.links-edit input[type="url"]:focus {
+  outline: none;
+  border-color: var(--primary-purple);
+  box-shadow: 0 0 0 2px rgba(106, 13, 173, 0.2);
+}
+
+/* Hide elements based on mode */
+body.editing-links .edit-mode-inactive {
+    display: none !important; /* Hide display elements in edit mode */
+}
+
+body:not(.editing-links) .edit-mode-active {
+    display: none !important; /* Hide edit elements in display mode */
 }
