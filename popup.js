@@ -68,11 +68,25 @@ document.addEventListener('DOMContentLoaded', function() {
   // --- Copy Logic (Adjusted for link items) --- 
   function copyToClipboard(text, element) {
     navigator.clipboard.writeText(text).then(() => {
-      // Visual feedback on the item container
+      // Add copied-feedback class for animation
+      element.classList.add('copied-feedback');
+      
+      // Apply scale animation
+      element.style.animation = 'copiedAnimation 0.5s';
+      
+      // Change background to provide visual feedback
       const originalBg = element.style.backgroundColor;
-      element.style.backgroundColor = 'var(--lighter-purple)'; // Use hover color briefly
+      element.style.backgroundColor = 'var(--lighter-purple)';
+      
+      // Remove animation and class after animations complete
       setTimeout(() => {
         element.style.backgroundColor = originalBg;
+        element.style.animation = '';
+        
+        // Remove the class after the animation completes
+        setTimeout(() => {
+          element.classList.remove('copied-feedback');
+        }, 1500); // Match fadeInOut animation duration
       }, 750);
     }).catch(err => {
       console.error('Failed to copy text: ', err);
