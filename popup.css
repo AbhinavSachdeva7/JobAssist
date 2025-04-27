@@ -29,11 +29,15 @@
   font-style: normal;
 }
 
+html,
+body {
+  background-color: var(--background-white); /* Ensure white background */
+}
+
 body {
   font-family: 'Poppins', sans-serif;
   width: 350px;
   padding: 15px;
-  background-color: var(--background-white);
   color: var(--text-dark);
   font-size: 14px; /* Slightly smaller base font size */
 }
@@ -66,12 +70,6 @@ body {
   color: var(--primary-purple); /* Purple text for active */
   border-bottom-color: var(--primary-purple); /* Purple border for active */
   background-color: transparent; /* Ensure transparent background */
-}
-
-.tab-button:not(.active) {
-    /* Remove specific inactive styles */
-    /* background-color: var(--background-white); */
-    /* box-shadow: 0 1px 2px rgba(0,0,0,0.05); */
 }
 
 .tab-button:not(.active):hover {
@@ -189,7 +187,9 @@ button:focus {
 #contacts input[type="text"],
 #contacts input[type="url"],
 #contacts input[type="email"] {
-  width: calc(100% - 24px); /* Account for padding and border */
+  /* width: calc(100% - 24px); */ /* Account for padding and border */
+  width: 100%; /* Make width 100% */
+  box-sizing: border-box; /* Include padding and border in the element's total width */
   padding: 10px;
   margin-bottom: 10px;
   border: 1px solid var(--border-medium);
@@ -206,17 +206,46 @@ button:focus {
   box-shadow: 0 0 0 2px rgba(106, 13, 173, 0.2);
 }
 
-#contacts button#add-contact {
-  background-color: var(--primary-purple); /* Keep primary purple */
+#contacts button#show-add-contact-form {
+  background-color: var(--primary-purple); /* Match save button */
+  color: white;
+  border: none;
+  text-align: center; /* Center align text */
+  font-weight: 600;
+  margin-bottom: 15px; /* Add space below */
+}
+
+/* Style the form container if needed */
+#add-contact-form {
+    /* padding: 15px; */ /* Remove padding or adjust as needed */
+    /* border: 1px solid var(--border-light); */ /* Remove border */
+    border-radius: 6px;
+    margin-bottom: 15px;
+    /* background-color: var(--background-light); */ /* Remove background color */
+}
+
+/* Center align the form heading */
+#add-contact-form h3 {
+    text-align: center;
+    margin-bottom: 15px; /* Add some space below heading */
+}
+
+#contacts button#save-contact-button {
+  background-color: var(--primary-purple); /* Restore primary purple background */
   color: white;
   border: none;
   text-align: center;
   font-weight: 600;
+  /* Remove inherited styles from quick links save button */
+  padding: 10px 12px !important; /* Restore original padding */
+  border: none !important; /* Ensure no border */
 }
-#contacts button#add-contact:hover {
+#contacts button#save-contact-button:hover {
   background-color: var(--dark-purple); /* Darken on hover */
+  /* Remove inherited styles */
   border-color: var(--dark-purple);
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  color: white !important; /* Ensure text stays white on hover */
 }
 
 #contacts hr {
@@ -333,14 +362,14 @@ button:focus {
 }
 
 /* Ensure Save/Cancel still look okay with this base style */
-#save-links-button {
+#save-links-button { /* Removed #contacts button#save-contact-button from this rule */
     /* Add back border/background for save */
     border: 1px solid var(--primary-purple) !important;
     background-color: var(--lighter-purple) !important;
     padding: 5px 8px !important; /* Restore padding */
 }
 
-#save-links-button:hover {
+#save-links-button:hover { /* Removed #contacts button#save-contact-button from this rule */
     background-color: var(--primary-purple) !important;
     color: white !important;
 }

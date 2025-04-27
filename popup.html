@@ -68,12 +68,15 @@
   </div>
 
   <div id="contacts" class="tab-content">
-    <h3>Add New Contact</h3>
-    <input type="text" id="contact-name" placeholder="Name">
-    <input type="email" id="contact-email" placeholder="Email">
-    <input type="text" id="contact-employer" placeholder="Employer (Optional)">
-    <input type="url" id="contact-url" placeholder="LinkedIn/Website URL (Optional)">
-    <button id="add-contact">Add Contact</button>
+    <button id="show-add-contact-form">Add New Contact</button> <!-- New button to show form -->
+    <div id="add-contact-form" style="display: none;"> <!-- Form container, initially hidden -->
+        <h3>Add New Contact</h3>
+        <input type="text" id="contact-name" placeholder="Name">
+        <input type="email" id="contact-email" placeholder="Email">
+        <input type="text" id="contact-employer" placeholder="Employer (Optional)">
+        <input type="url" id="contact-url" placeholder="LinkedIn/Website URL (Optional)">
+        <button id="save-contact-button">Save</button> <!-- Renamed button -->
+    </div>
     <hr>
     <h3>Saved Contacts</h3>
     <div class="delete-all-container"> <!-- Added wrapper div -->

@@ -138,7 +138,9 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   // --- Contacts Logic ---
-  const addContactButton = document.getElementById('add-contact');
+  const showAddContactFormButton = document.getElementById('show-add-contact-form');
+  const addContactFormDiv = document.getElementById('add-contact-form');
+  const saveContactButton = document.getElementById('save-contact-button'); // Renamed from addContactButton
   const contactNameInput = document.getElementById('contact-name');
   const contactEmailInput = document.getElementById('contact-email');
   // Add references for the other input fields
@@ -146,6 +148,12 @@ document.addEventListener('DOMContentLoaded', function() {
   const contactUrlInput = document.getElementById('contact-url');
   const contactsListDiv = document.getElementById('contacts-list');
   const CONTACTS_STORAGE_KEY = 'jobAppHelperContacts';
+
+  // --- Show/Hide Add Contact Form Logic ---
+  showAddContactFormButton.addEventListener('click', () => {
+    addContactFormDiv.style.display = 'block'; // Show the form
+    showAddContactFormButton.style.display = 'none'; // Hide the 'Add New Contact' button
+  });
 
   // Load contacts from storage
   async function loadContacts() {
@@ -257,14 +265,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 contactEmailInput.value = '';
                 contactEmployerInput.value = ''; // Clear using reference
                 contactUrlInput.value = ''; // Clear using reference
+
+                // Hide the form and show the button again after saving
+                addContactFormDiv.style.display = 'none';
+                showAddContactFormButton.style.display = 'block';
             }
         } else {
             alert('Please enter both name and email.');
         }
    }
 
-   // Add contact button listener
-   addContactButton.addEventListener('click', handleAddContact);
+   // Add contact button listener (now the Save button)
+   saveContactButton.addEventListener('click', handleAddContact);
 
    // Add keydown listener to input fields for Enter key
    const contactInputs = [contactNameInput, contactEmailInput, contactEmployerInput, contactUrlInput];
