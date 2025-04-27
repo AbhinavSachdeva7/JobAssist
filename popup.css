@@ -274,36 +274,40 @@ button:focus {
 }
 
 .icon-button {
-  background: none !important;
-  border: 1px solid var(--border-light) !important; /* Add a light border */
-  padding: 5px 8px !important; /* Adjust padding */
+  background: none !important; /* Remove background */
+  border: none !important; /* Remove border */
+  padding: 4px !important; /* Adjust padding */
   margin-left: 5px !important;
   cursor: pointer !important;
-  display: inline-flex !important; /* Align icon and text */
+  display: inline-flex !important;
   align-items: center !important;
-  width: auto !important; /* Override general button width */
+  width: auto !important;
   font-size: 0.9em !important;
-  color: var(--primary-purple) !important;
+  color: var(--primary-purple) !important; /* Keep text purple */
   box-shadow: none !important;
+  border-radius: 4px !important; /* Slightly smaller radius */
+  transition: background-color 0.2s ease !important;
 }
 
-.icon-button img {
-  width: 14px;
-  height: 14px;
-  margin-right: 4px;
+.icon-button svg { /* Target the inline SVG */
+  width: 12px; /* Match SVG attribute */
+  height: 12px; /* Match SVG attribute */
+  margin-right: 5px; /* Add space between icon and text */
+  vertical-align: middle; /* Align icon vertically with text */
 }
 
 .icon-button:hover {
-  text-decoration: none !important; /* Remove underline on hover */
-  background-color: var(--lighter-purple) !important; /* Add hover background */
-  border-color: var(--light-purple) !important;
+  text-decoration: none !important;
+  background-color: var(--lighter-purple) !important; /* Add subtle background on hover */
+  /* border-color: var(--light-purple) !important; */ /* No border */
 }
 
+/* Ensure Save/Cancel still look okay with this base style */
 #save-links-button {
-    /* Use theme colors */
-    color: var(--primary-purple) !important;
-    border-color: var(--primary-purple) !important;
+    /* Add back border/background for save */
+    border: 1px solid var(--primary-purple) !important;
     background-color: var(--lighter-purple) !important;
+    padding: 5px 8px !important; /* Restore padding */
 }
 
 #save-links-button:hover {
@@ -312,10 +316,11 @@ button:focus {
 }
 
 #cancel-edit-links-button {
-    /* Use theme colors */
-    color: var(--text-medium) !important;
-    border-color: var(--border-medium) !important;
+    /* Add back border/background for cancel */
+    border: 1px solid var(--border-medium) !important;
     background-color: var(--background-white) !important;
+    color: var(--text-medium) !important;
+    padding: 5px 8px !important; /* Restore padding */
 }
 
 #cancel-edit-links-button:hover {
