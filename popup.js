@@ -164,7 +164,8 @@ document.addEventListener('DOMContentLoaded', function() {
   // --- Contacts Logic ---
   const showAddContactFormButton = document.getElementById('show-add-contact-form');
   const addContactFormDiv = document.getElementById('add-contact-form');
-  const saveContactButton = document.getElementById('save-contact-button'); // Renamed from addContactButton
+  const saveContactButton = document.getElementById('save-contact-button');
+  const cancelContactButton = document.getElementById('cancel-contact-button'); // Add reference to cancel button
   const contactNameInput = document.getElementById('contact-name');
   const contactEmailInput = document.getElementById('contact-email');
   // Add references for the other input fields
@@ -274,6 +275,19 @@ document.addEventListener('DOMContentLoaded', function() {
     await chrome.storage.local.set({ [CONTACTS_STORAGE_KEY]: contacts });
     loadContacts(); // Reload the list in the UI
   }
+
+  // Add listener for the cancel button
+  cancelContactButton.addEventListener('click', () => {
+    // Clear form fields
+    contactNameInput.value = '';
+    contactEmailInput.value = '';
+    contactEmployerInput.value = '';
+    contactUrlInput.value = '';
+
+    // Hide form and show add button
+    addContactFormDiv.style.display = 'none';
+    showAddContactFormButton.style.display = 'block';
+  });
 
   // Add listener for the Delete All button
   const deleteAllContactsButton = document.getElementById('delete-all-contacts');

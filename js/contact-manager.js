@@ -7,6 +7,7 @@ const ContactManager = {
     this.showAddContactFormButton = document.getElementById('show-add-contact-form');
     this.addContactFormDiv = document.getElementById('add-contact-form');
     this.saveContactButton = document.getElementById('save-contact-button');
+    this.cancelContactButton = document.getElementById('cancel-contact-button');
     this.contactNameInput = document.getElementById('contact-name');
     this.contactEmailInput = document.getElementById('contact-email');
     this.contactEmployerInput = document.getElementById('contact-employer');
@@ -18,11 +19,13 @@ const ContactManager = {
     this.handleAddContact = this.handleAddContact.bind(this);
     this.showAddContactForm = this.showAddContactForm.bind(this);
     this.handleDeleteAll = this.handleDeleteAll.bind(this);
+    this.handleCancelContact = this.handleCancelContact.bind(this);
     
     // Set up event listeners
     this.showAddContactFormButton.addEventListener('click', this.showAddContactForm);
     this.saveContactButton.addEventListener('click', this.handleAddContact);
     this.deleteAllContactsButton.addEventListener('click', this.handleDeleteAll);
+    this.cancelContactButton.addEventListener('click', this.handleCancelContact);
     
     // Add keydown listeners for Enter key in inputs
     const contactInputs = [
@@ -191,23 +194,21 @@ const ContactManager = {
     }
   },
   
-  // Helper for showing toast messages
+  handleCancelContact() {
+    // Clear form fields
+    this.contactNameInput.value = '';
+    this.contactEmailInput.value = '';
+    this.contactEmployerInput.value = '';
+    this.contactUrlInput.value = '';
+
+    // Hide form and show add button
+    this.addContactFormDiv.style.display = 'none';
+    this.showAddContactFormButton.style.display = 'block';
+  },
+
+  // Helper for showing toast messages - disabled as requested
   showToast(message, type = 'success') {
-    const toast = document.createElement('div');
-    toast.className = `toast toast-${type}`;
-    toast.textContent = message;
-    
-    document.body.appendChild(toast);
-    
-    setTimeout(() => {
-      toast.classList.add('show');
-    }, 10);
-    
-    setTimeout(() => {
-      toast.classList.remove('show');
-      setTimeout(() => {
-        document.body.removeChild(toast);
-      }, 300);
-    }, 3000);
+    // Empty implementation to remove toast notifications
+    return;
   }
 };
