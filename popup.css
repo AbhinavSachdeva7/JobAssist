@@ -234,19 +234,21 @@ button:focus {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  /* box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04); */ /* Remove box-shadow */
   transition: box-shadow 0.2s ease;
 }
 
 #contacts-list div:hover {
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
+    /* box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08); */ /* Remove hover box-shadow */
 }
 
 .contact-info {
-  flex-grow: 1;
-  margin-right: 10px;
-  color: var(--text-dark);
-  line-height: 1.4;
+    display: inline-block; /* Allow buttons next to it */
+    margin-right: 10px; /* Space between info and buttons */
+    vertical-align: top; /* Align top */
+    max-width: calc(100% - 100px); /* Prevent text from pushing buttons too far */
+    color: var(--text-dark);
+    line-height: 1.4;
 }
 
 .contact-info strong {
@@ -269,8 +271,10 @@ button:focus {
   text-align: center !important;
   font-size: 0.9em !important;
   font-weight: 500 !important;
+  line-height: 1.2 !important; /* Ensure consistent line height */
   box-shadow: none !important; /* Remove any inherited shadow */
   transition: background-color 0.2s ease !important;
+  margin-right: 5px; /* Add space between email and delete */
 }
 
 .email-button:hover {
@@ -381,5 +385,59 @@ body.editing-links .edit-mode-inactive {
 
 body:not(.editing-links) .edit-mode-active {
     display: none !important; /* Hide edit elements in display mode */
+}
+
+/* Add this to popup.css for basic styling of the delete buttons */
+.delete-button {
+  background-color: transparent !important; /* Make background transparent */
+  color: var(--danger-red) !important; /* Use red color for the icon/text */
+  border: 1px solid var(--danger-red) !important; /* Add a subtle border */
+  padding: 5px 10px !important; /* Match email button padding (adjust top/bottom slightly for border) */
+  border-radius: 5px !important; /* Match email button radius */
+  cursor: pointer !important;
+  font-size: 0.9em !important; /* Match email button font size */
+  font-weight: 500 !important; /* Match email button font weight */
+  line-height: 1.2 !important; /* Match email button line height */
+  margin-left: 0px !important; /* Remove margin-left, handled by email button margin-right */
+  vertical-align: middle !important; /* Align with text/other buttons */
+  width: auto !important; /* Ensure width is auto */
+  text-align: center !important; /* Center text */
+  box-shadow: none !important; /* Remove any shadow */
+  transition: background-color 0.2s ease, color 0.2s ease !important; /* Add transitions */
+}
+
+.delete-button:hover {
+  background-color: var(--danger-red) !important; /* Red background on hover */
+  color: white !important; /* White icon/text on hover */
+}
+
+/* New wrapper for Delete All button */
+.delete-all-container {
+  display: flex;
+  justify-content: flex-end; /* Align button to the right */
+  margin-bottom: 10px; /* Keep the space below the button */
+}
+
+#delete-all-contacts {
+  /* display: block; */ /* No longer needed */
+  /* margin-left: auto; */ /* No longer needed */
+  margin-right: 0; /* Ensure no extra right margin */
+  /* margin-bottom: 10px; */ /* Moved to container */
+  background-color: var(--danger-red);
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  width: auto;
+  max-width: fit-content;
+  /* Inherit other button styles as needed or redefine */
+  border-radius: 5px; /* Ensure radius is kept */
+  cursor: pointer; /* Ensure cursor is kept */
+  font-size: 0.9em; /* Match other buttons */
+  font-weight: 500; /* Match other buttons */
+  line-height: 1.2; /* Match other buttons */
+}
+
+#delete-all-contacts:hover {
+  background-color: var(--danger-red-dark);
 }
 

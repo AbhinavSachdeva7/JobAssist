@@ -152,15 +152,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const savedContacts = result[CONTACTS_STORAGE_KEY] || []; // Default to empty array if not found
     contactsListDiv.innerHTML = ''; // Clear existing list
     if (savedContacts.length === 0) {
-        contactsListDiv.innerHTML = '<p style="color: var(--medium-grey); font-style: italic;">No contacts saved yet.</p>';
+        contactsListDiv.innerHTML = '<p style=\"color: var(--medium-grey); font-style: italic;\">No contacts saved yet.</p>';
     }
     savedContacts.forEach(contact => {
-      displayContact(contact.name, contact.email);
+      // Pass employer and url to displayContact
+      displayContact(contact.name, contact.email, contact.employer, contact.url);
     });
   }
 
   // Display a single contact in the list
-  function displayContact(name, email) {
+  function displayContact(name, email, employer, url) {
      // Remove the "No contacts" message if it exists
      const noContactsMsg = contactsListDiv.querySelector('p');
      if (noContactsMsg && noContactsMsg.textContent.includes('No contacts')) {
@@ -169,9 +170,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
      const contactDiv = document.createElement('div');
      contactDiv.setAttribute('data-contact-email', email);
+     // Update innerHTML to include employer, URL, and a Delete button
      contactDiv.innerHTML = `
-        <span class="contact-info"><strong>${name}</strong><br><span>${email}</span></span>
-        <button class="email-button" data-email="${email}" title="Email ${name}">Email</button>
+        <span class="contact-info">
+            <strong>${name}</strong><br>
+            <span>${email}</span>
+            ${employer ? `<br><span class=\"contact-employer\">Employer: ${employer}</span>` : ''}
+            ${url ? `<br><a href=\"${url}\" target=\"_blank\" class=\"contact-url\">Link</a>` : ''}
+        </span>
+        <div class="contact-actions"> <!-- Wrapper for buttons -->
+            <button class=\"email-button\" data-email=\"${email}\" title=\"Email ${name}\">Email</button>
+            <button class=\"delete-button\" data-email=\"${email}\" title=\"Delete ${name}\">Delete</button> <!-- Added Delete button -->
+        </div>
      `;
 
      // Email button listener
@@ -180,11 +190,17 @@ document.addEventListener('DOMContentLoaded', function() {
         window.open(`mailto:${mailtoEmail}`);
      });
 
+     // Delete button listener
+     contactDiv.querySelector('.delete-button').addEventListener('click', (e) => {
+        const emailToDelete = e.target.getAttribute('data-email');
+        deleteContact(emailToDelete);
+     });
+
      contactsListDiv.appendChild(contactDiv);
   }
 
   // Save contact to storage
-  async function saveContact(name, email) {
+  async function saveContact(name, email, employer, url) { // Add employer and url parameters
     const result = await chrome.storage.local.get(CONTACTS_STORAGE_KEY);
     const contacts = result[CONTACTS_STORAGE_KEY] || [];
 
@@ -194,7 +210,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return false; // Indicate failure
     }
 
-    contacts.push({ name, email });
+    contacts.push({ name, email, employer, url }); // Add employer and url to the saved object
     await chrome.storage.local.set({ [CONTACTS_STORAGE_KEY]: contacts });
     return true; // Indicate success
   }
@@ -208,10 +224,25 @@ document.addEventListener('DOMContentLoaded', function() {
     loadContacts(); // Reload the list in the UI
   }
 
+  // Add listener for the Delete All button
+  const deleteAllContactsButton = document.getElementById('delete-all-contacts');
+  if (deleteAllContactsButton) { // Check if the button exists
+      deleteAllContactsButton.addEventListener('click', async () => {
+          if (confirm('Are you sure you want to delete ALL contacts? This cannot be undone.')) {
+              await chrome.storage.local.remove(CONTACTS_STORAGE_KEY); // Remove the key entirely
+              loadContacts(); // Reload the (now empty) list
+          }
+      });
+  }
+
    // Add contact button listener
    addContactButton.addEventListener('click', async () => {
         const name = contactNameInput.value.trim();
         const email = contactEmailInput.value.trim();
+        // Get employer and url values
+        const employer = document.getElementById('contact-employer').value.trim();
+        const url = document.getElementById('contact-url').value.trim();
+
 
         // Basic email validation
         if (!email.includes('@') || !email.includes('.')) {
@@ -220,19 +251,23 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         if (name && email) {
-            const saved = await saveContact(name, email);
+            // Pass employer and url to saveContact
+            const saved = await saveContact(name, email, employer, url);
             if (saved) {
-                displayContact(name, email); // Display immediately
-                // Clear inputs
+                // Pass employer and url to displayContact
+                displayContact(name, email, employer, url); // Display immediately
+                // Clear inputs, including new ones
                 contactNameInput.value = '';
                 contactEmailInput.value = '';
+                document.getElementById('contact-employer').value = '';
+                document.getElementById('contact-url').value = '';
             }
         } else {
             alert('Please enter both name and email.');
         }
    });
 
-   // --- Initial Load --- 
+   // --- Initial Load ---
    loadQuickLinks();
    loadContacts();
 });
