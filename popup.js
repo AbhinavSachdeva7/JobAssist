@@ -68,31 +68,41 @@ document.addEventListener('DOMContentLoaded', function() {
   // --- Copy Logic (Adjusted for link items) --- 
   function copyToClipboard(text, element) {
     navigator.clipboard.writeText(text).then(() => {
-      // Add copied-feedback class for animation
-      element.classList.add('copied-feedback');
+      // Add animation classes
+      element.classList.add('being-copied');
       
-      // Apply scale animation
-      element.style.animation = 'copiedAnimation 0.5s';
+      // Create and append a temporary checkmark icon
+      const checkmark = document.createElement('div');
+      checkmark.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="color: var(--primary); position: absolute; top: 50%; right: 10px; transform: translateY(-50%); opacity: 0; transition: opacity 0.3s ease;">
+        <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
+      </svg>`;
+      const svg = checkmark.firstChild;
+      element.appendChild(svg);
       
-      // Change background to provide visual feedback
-      const originalBg = element.style.backgroundColor;
-      element.style.backgroundColor = 'var(--background)';
-      
-      // Remove animation and class after animations complete
+      // Fade in the checkmark
       setTimeout(() => {
-        element.style.backgroundColor = originalBg;
-        element.style.animation = '';
+        svg.style.opacity = '1';
+      }, 100);
+      
+      // Remove animation classes and clean up after animation completes
+      setTimeout(() => {
+        element.classList.remove('being-copied');
         
-        // Remove the class after the animation completes
+        // Fade out checkmark
+        svg.style.opacity = '0';
+        
+        // Remove the checkmark after fade out
         setTimeout(() => {
-          element.classList.remove('copied-feedback');
-        }, 1200); // Match fadeInOut animation duration
-      }, 750);
+          if (element.contains(svg)) {
+            element.removeChild(svg);
+          }
+        }, 300);
+      }, 800);
     }).catch(err => {
       console.error('Failed to copy text: ', err);
       const originalBorder = element.style.borderColor; 
-      element.style.border = '1px solid var(--danger)';
-       setTimeout(() => {
+      element.style.border = '1px solid var(--danger-red)';
+      setTimeout(() => {
         element.style.border = originalBorder || 'none'; // Revert border
       }, 1500);
     });
