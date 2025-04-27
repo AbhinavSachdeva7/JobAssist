@@ -1,3 +1,19 @@
+:root {
+  --primary-purple: #6a0dad;
+  --light-purple: #8a2be2;
+  --lighter-purple: #f2e6ff;
+  --dark-purple: #4c0a7d;
+  --text-dark: #333333;
+  --text-medium: #555555;
+  --text-light: #777777;
+  --border-light: #e0e0e0;
+  --border-medium: #cccccc;
+  --background-light: #f9f9f9;
+  --background-white: #ffffff;
+  --danger-red: #dc3545;
+  --danger-red-dark: #c82333;
+}
+
 /* Define the Poppins font */
 @font-face {
   font-family: 'Poppins';
@@ -14,17 +30,18 @@
 }
 
 body {
-  font-family: 'Poppins', sans-serif; /* Use Poppins, fallback to sans-serif */
-  width: 300px; /* Adjust width as needed */
-  padding: 10px;
-  background-color: #ffffff; /* White background */
-  color: #333333; /* Dark grey text */
+  font-family: 'Poppins', sans-serif;
+  width: 350px;
+  padding: 15px;
+  background-color: var(--background-white);
+  color: var(--text-dark);
+  font-size: 14px; /* Slightly smaller base font size */
 }
 
 .tabs {
   display: flex;
-  border-bottom: 1px solid #e0e0e0; /* Lighter border */
-  margin-bottom: 10px;
+  border-bottom: 1px solid var(--border-light);
+  margin-bottom: 15px; /* Increased margin */
 }
 
 .tab-button {
@@ -32,118 +49,172 @@ body {
   cursor: pointer;
   border: none;
   background-color: transparent;
-  border-bottom: 2px solid transparent; /* For active indicator */
+  border-bottom: 3px solid transparent; /* Thicker indicator */
   margin-right: 5px;
   font-size: 1em;
-  color: #333333; /* Dark grey text */
+  color: var(--text-medium); /* Slightly lighter inactive text */
+  transition: color 0.2s ease, border-color 0.2s ease;
 }
 
 .tab-button.active {
-  border-bottom-color: #6a0dad; /* Purple active tab indicator */
+  border-bottom-color: var(--primary-purple);
   font-weight: bold;
-  color: #6a0dad; /* Keep active tab purple */
+  color: var(--primary-purple);
 }
 
 .tab-button:hover {
-  background-color: #f2e6ff; /* Light purple hover */
+  color: var(--primary-purple);
 }
 
 .tab-content {
-  display: none; /* Hide content by default */
+  display: none;
+  padding-top: 10px;
 }
 
 .tab-content.active {
-  display: block; /* Show active content */
+  display: block;
 }
 
 /* General button styling */
 button {
   display: block;
   width: 100%;
-  padding: 10px;
-  margin-bottom: 8px;
-  border: 1px solid #d1b3e6; /* Lighter purple border */
-  border-radius: 4px;
-  background-color: #ffffff; /* White background */
-  color: #333333; /* Dark grey text */
+  padding: 10px 12px;
+  margin-bottom: 10px; /* Increased margin */
+  border: 1px solid var(--border-light); /* Lighter border */
+  border-radius: 6px; /* Slightly more rounded */
+  background-color: var(--background-white);
+  color: var(--text-dark);
   cursor: pointer;
   text-align: left;
   font-size: 1em;
-  transition: background-color 0.2s ease, border-color 0.2s ease; /* Smooth transition */
+  font-family: inherit; /* Ensure font consistency */
+  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 button:hover {
-  background-color: #f2e6ff; /* Light purple hover */
-  border-color: #6a0dad; /* Darker purple border on hover */
+  background-color: var(--lighter-purple);
+  border-color: var(--light-purple);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+button:focus {
+  outline: none;
+  border-color: var(--primary-purple);
+  box-shadow: 0 0 0 2px rgba(106, 13, 173, 0.2);
 }
 
 /* Specific button styling */
 #quick-links button {
-  display: flex; /* Use flexbox for icon alignment */
+  display: flex;
   align-items: center;
 }
 
-#quick-links button img { /* Changed selector back from i to img */
-  margin-right: 8px; /* Space between icon and text */
-  width: 16px; /* Adjust icon size as needed */
-  height: 16px;
+#quick-links button img {
+  margin-right: 10px; /* Increased space */
+  width: 18px;
+  height: 18px;
 }
 
 #contacts h3 {
   margin-top: 15px;
-  margin-bottom: 5px;
-  font-size: 1.1em;
-  color: #333333; /* Dark grey headings */
+  margin-bottom: 10px; /* Increased margin */
+  font-size: 1.15em; /* Slightly larger */
+  color: var(--text-dark);
+  font-weight: 600; /* Semi-bold */
 }
 
 #contacts input[type="text"],
 #contacts input[type="email"] {
-  width: calc(100% - 22px); /* Account for padding and border */
-  padding: 8px;
-  margin-bottom: 5px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  width: calc(100% - 24px); /* Account for padding and border */
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid var(--border-medium);
+  border-radius: 6px;
+  font-size: 1em;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+#contacts input[type="text"]:focus,
+#contacts input[type="email"]:focus {
+  outline: none;
+  border-color: var(--primary-purple);
+  box-shadow: 0 0 0 2px rgba(106, 13, 173, 0.2);
 }
 
 #contacts button#add-contact {
-  background-color: #6a0dad; /* Purple */
+  background-color: var(--primary-purple);
   color: white;
   border: none;
   text-align: center;
+  font-weight: 600;
 }
 #contacts button#add-contact:hover {
-  background-color: #4c0a7d; /* Darker purple */
+  background-color: var(--dark-purple);
+  border-color: var(--dark-purple);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+#contacts hr {
+  border: none;
+  border-top: 1px solid var(--border-light);
+  margin: 20px 0;
 }
 
 #contacts-list div {
-  background-color: #f9f9f9; /* Slightly off-white for list items */
-  padding: 8px;
-  margin-bottom: 5px;
-  border: 1px solid #e0e0e0; /* Lighter border */
-  border-radius: 4px;
+  background-color: var(--background-white);
+  padding: 12px;
+  margin-bottom: 8px;
+  border: 1px solid var(--border-light);
+  border-radius: 6px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: box-shadow 0.2s ease;
+}
+
+#contacts-list div:hover {
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
 }
 
 .contact-info {
   flex-grow: 1;
   margin-right: 10px;
-  color: #333333; /* Dark grey contact info text */
+  color: var(--text-dark);
+  line-height: 1.4;
+}
+
+.contact-info strong {
+    font-weight: 600;
+}
+
+.contact-info span {
+    font-size: 0.9em;
+    color: var(--text-light);
 }
 
 .email-button {
-  padding: 5px 10px !important; /* Override general button padding */
-  background-color: #8a2be2 !important; /* Lighter Purple for email button */
+  padding: 6px 12px !important;
+  background-color: var(--light-purple) !important;
   color: white !important;
-  border: none !important;
-  border-radius: 3px !important;
+  border: none !important; /* Explicitly remove border */
+  border-radius: 5px !important;
   cursor: pointer !important;
-  width: auto !important; /* Override width */
+  width: auto !important;
   text-align: center !important;
-  font-size: 0.9em !important; /* Slightly smaller font */
+  font-size: 0.9em !important;
+  font-weight: 500 !important;
+  box-shadow: none !important; /* Remove any inherited shadow */
+  transition: background-color 0.2s ease !important;
 }
 
 .email-button:hover {
-  background-color: #6a0dad !important; /* Darker purple on hover */
+  background-color: var(--primary-purple) !important;
+  box-shadow: none !important; /* Ensure no shadow on hover either */
+}
+
+.email-button:focus {
+    outline: none !important;
+    box-shadow: 0 0 0 2px rgba(138, 43, 226, 0.3) !important; /* Focus ring with lighter purple */
 }

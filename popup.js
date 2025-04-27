@@ -1,4 +1,22 @@
 document.addEventListener('DOMContentLoaded', function() {
+  // --- Tab Switching Logic ---
+  const tabButtons = document.querySelectorAll('.tab-button');
+  const tabContents = document.querySelectorAll('.tab-content');
+
+  tabButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      const targetTab = button.getAttribute('data-tab');
+
+      // Deactivate all tabs and content
+      tabButtons.forEach(btn => btn.classList.remove('active'));
+      tabContents.forEach(content => content.classList.remove('active'));
+
+      // Activate the clicked tab and corresponding content
+      button.classList.add('active');
+      document.getElementById(targetTab).classList.add('active');
+    });
+  });
+
   // --- Existing Quick Links Logic ---
     const links = {
       linkedin: 'https://www.linkedin.com/in/mab-malik/', // Replace with your actual LinkedIn URL
@@ -65,13 +83,12 @@ document.addEventListener('DOMContentLoaded', function() {
        }
 
        const contactDiv = document.createElement('div');
-       // Use email as a unique identifier for deletion
+       // Use email as a unique identifier
        contactDiv.setAttribute('data-contact-email', email);
        contactDiv.innerHTML = `
           <span class="contact-info"><strong>${name}</strong><br><span style="font-size: 0.9em; color: var(--medium-grey);">${email}</span></span>
           <div>
             <button class="email-button" data-email="${email}" title="Email ${name}">Email</button>
-            <button class="delete-button" data-email="${email}" title="Delete ${name}">✕</button> 
           </div>
        `;
 
@@ -79,15 +96,6 @@ document.addEventListener('DOMContentLoaded', function() {
        contactDiv.querySelector('.email-button').addEventListener('click', (e) => {
           const mailtoEmail = e.target.getAttribute('data-email');
           window.open(`mailto:${mailtoEmail}`);
-          // console.log(`Emailing ${name} at ${email}`);
-       });
-
-       // Delete button listener
-       contactDiv.querySelector('.delete-button').addEventListener('click', async (e) => {
-          const emailToDelete = e.target.getAttribute('data-email');
-          if (confirm(`Are you sure you want to delete the contact for ${emailToDelete}?`)) {
-              await deleteContact(emailToDelete);
-          }
        });
 
        contactsListDiv.appendChild(contactDiv);
