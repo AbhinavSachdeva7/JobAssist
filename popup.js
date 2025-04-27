@@ -74,8 +74,6 @@ document.addEventListener('DOMContentLoaded', function() {
       setTimeout(() => {
         element.style.backgroundColor = originalBg;
       }, 750);
-      // Close the popup
-      setTimeout(() => window.close(), 100); // Close shortly after copy
     }).catch(err => {
       console.error('Failed to copy text: ', err);
       const originalBorder = element.style.borderColor; // Use border for error
