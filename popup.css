@@ -40,30 +40,36 @@ body {
 
 .tabs {
   display: flex;
-  border-bottom: 1px solid var(--border-light);
-  margin-bottom: 15px; /* Increased margin */
+  margin-bottom: 15px;
+  background-color: var(--background-light); /* Keep light grey for the bar */
+  border-radius: 8px; /* Keep rounding on the container */
+  padding: 4px; /* Keep padding for inset effect */
 }
 
 .tab-button {
-  padding: 10px 15px;
+  flex-grow: 1;
+  padding: 8px 15px;
   cursor: pointer;
   border: none;
-  background-color: transparent;
-  border-bottom: 3px solid transparent; /* Thicker indicator */
-  margin-right: 5px;
-  font-size: 1em;
-  color: var(--text-medium); /* Slightly lighter inactive text */
-  transition: color 0.2s ease, border-color 0.2s ease;
+  color: var(--text-medium);
+  border-radius: 6px; /* Apply rounding to individual buttons for the inset effect */
+  text-align: center;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .tab-button.active {
-  border-bottom-color: var(--primary-purple);
-  font-weight: bold;
-  color: var(--primary-purple);
+  font-weight: 600;
+  color: var(--primary-purple); /* Darker purple text for contrast */
+  background-color: var(--lighter-purple); /* Use the lighter purple background */
 }
 
-.tab-button:hover {
+.tab-button:not(.active) {
+    background-color: transparent; /* Ensure inactive is transparent */
+}
+
+.tab-button:not(.active):hover {
   color: var(--primary-purple);
+  background-color: rgba(255, 255, 255, 0.5); /* Subtle white hover for inactive */
 }
 
 .tab-content {
@@ -330,28 +336,31 @@ button:focus {
 }
 
 .links-edit .form-group {
-  margin-bottom: 10px;
+  margin-bottom: 15px; /* Increased spacing between fields */
 }
 
 .links-edit label {
   display: block;
-  margin-bottom: 3px;
+  margin-bottom: 5px; /* Increased space below label */
   font-size: 0.9em;
   color: var(--text-medium);
+  font-weight: 500; /* Slightly bolder label */
 }
 
 .links-edit input[type="url"] {
-  width: calc(100% - 22px); /* Match other inputs */
-  padding: 8px;
+  width: calc(100% - 24px); /* Consistent width accounting for padding/border */
+  padding: 10px; /* Match contact input padding */
   border: 1px solid var(--border-medium);
-  border-radius: 4px;
-  font-size: 0.95em;
+  border-radius: 6px; /* Match contact input radius */
+  font-size: 1em; /* Match contact input font size */
+  font-family: inherit; /* Ensure consistent font */
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .links-edit input[type="url"]:focus {
   outline: none;
   border-color: var(--primary-purple);
-  box-shadow: 0 0 0 2px rgba(106, 13, 173, 0.2);
+  box-shadow: 0 0 0 2px rgba(106, 13, 173, 0.2); /* Consistent focus shadow */
 }
 
 /* Hide elements based on mode */
