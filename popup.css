@@ -207,14 +207,14 @@ button:focus {
 }
 
 #contacts button#add-contact {
-  background-color: var(--primary-purple);
+  background-color: var(--primary-purple); /* Keep primary purple */
   color: white;
   border: none;
   text-align: center;
   font-weight: 600;
 }
 #contacts button#add-contact:hover {
-  background-color: var(--dark-purple);
+  background-color: var(--dark-purple); /* Darken on hover */
   border-color: var(--dark-purple);
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
@@ -234,12 +234,12 @@ button:focus {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  /* box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04); */ /* Remove box-shadow */
-  transition: box-shadow 0.2s ease;
+  box-shadow: none !important; /* Explicitly remove box-shadow */
+  transition: none !important; /* Remove transition if it was related to shadow */
 }
 
 #contacts-list div:hover {
-    /* box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08); */ /* Remove hover box-shadow */
+    box-shadow: none !important; /* Explicitly remove hover box-shadow */
 }
 
 .contact-info {
@@ -260,9 +260,18 @@ button:focus {
     color: var(--text-light);
 }
 
+/* Add this new rule */
+.contact-actions {
+  border: none !important;
+  background-color: transparent !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  box-shadow: none !important;
+}
+
 .email-button {
   padding: 6px 12px !important;
-  background-color: var(--light-purple) !important;
+  background-color: var(--primary-purple) !important; /* Change to primary purple */
   color: white !important;
   border: none !important; /* Explicitly remove border */
   border-radius: 5px !important;
@@ -278,7 +287,7 @@ button:focus {
 }
 
 .email-button:hover {
-  background-color: var(--primary-purple) !important;
+  background-color: var(--dark-purple) !important; /* Darken on hover */
   box-shadow: none !important; /* Ensure no shadow on hover either */
 }
 
@@ -389,26 +398,26 @@ body:not(.editing-links) .edit-mode-active {
 
 /* Add this to popup.css for basic styling of the delete buttons */
 .delete-button {
-  background-color: transparent !important; /* Make background transparent */
-  color: var(--danger-red) !important; /* Use red color for the icon/text */
-  border: 1px solid var(--danger-red) !important; /* Add a subtle border */
-  padding: 5px 10px !important; /* Match email button padding (adjust top/bottom slightly for border) */
+  background-color: var(--background-white) !important; /* Match background */
+  color: var(--danger-red) !important; /* Red text */
+  border: 1px solid var(--danger-red) !important; /* Red border */
+  padding: 5px 11px !important; /* Adjust padding slightly for border */
   border-radius: 5px !important; /* Match email button radius */
   cursor: pointer !important;
   font-size: 0.9em !important; /* Match email button font size */
   font-weight: 500 !important; /* Match email button font weight */
   line-height: 1.2 !important; /* Match email button line height */
-  margin-left: 0px !important; /* Remove margin-left, handled by email button margin-right */
-  vertical-align: middle !important; /* Align with text/other buttons */
-  width: auto !important; /* Ensure width is auto */
-  text-align: center !important; /* Center text */
-  box-shadow: none !important; /* Remove any shadow */
-  transition: background-color 0.2s ease, color 0.2s ease !important; /* Add transitions */
+  margin-left: 0px !important;
+  vertical-align: middle !important;
+  width: auto !important;
+  text-align: center !important;
+  box-shadow: none !important;
+  transition: background-color 0.2s ease, color 0.2s ease !important;
 }
 
 .delete-button:hover {
   background-color: var(--danger-red) !important; /* Red background on hover */
-  color: white !important; /* White icon/text on hover */
+  color: white !important; /* White text on hover */
 }
 
 /* New wrapper for Delete All button */
@@ -423,21 +432,22 @@ body:not(.editing-links) .edit-mode-active {
   /* margin-left: auto; */ /* No longer needed */
   margin-right: 0; /* Ensure no extra right margin */
   /* margin-bottom: 10px; */ /* Moved to container */
-  background-color: var(--danger-red);
-  color: white;
-  border: none;
-  padding: 5px 10px;
+  background-color: var(--background-white); /* Match background */
+  color: var(--danger-red); /* Red text */
+  border: 1px solid var(--danger-red); /* Red border */
+  padding: 4px 9px; /* Adjust padding slightly for border */
   width: auto;
   max-width: fit-content;
-  /* Inherit other button styles as needed or redefine */
-  border-radius: 5px; /* Ensure radius is kept */
-  cursor: pointer; /* Ensure cursor is kept */
-  font-size: 0.9em; /* Match other buttons */
-  font-weight: 500; /* Match other buttons */
-  line-height: 1.2; /* Match other buttons */
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9em;
+  font-weight: 500;
+  line-height: 1.2;
+  transition: background-color 0.2s ease, color 0.2s ease; /* Add transition */
 }
 
 #delete-all-contacts:hover {
-  background-color: var(--danger-red-dark);
+  background-color: var(--danger-red); /* Red background on hover */
+  color: white; /* White text on hover */
 }
 

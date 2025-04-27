@@ -143,6 +143,9 @@ document.addEventListener('DOMContentLoaded', function() {
   const addContactButton = document.getElementById('add-contact');
   const contactNameInput = document.getElementById('contact-name');
   const contactEmailInput = document.getElementById('contact-email');
+  // Add references for the other input fields
+  const contactEmployerInput = document.getElementById('contact-employer');
+  const contactUrlInput = document.getElementById('contact-url');
   const contactsListDiv = document.getElementById('contacts-list');
   const CONTACTS_STORAGE_KEY = 'jobAppHelperContacts';
 
@@ -235,14 +238,12 @@ document.addEventListener('DOMContentLoaded', function() {
       });
   }
 
-   // Add contact button listener
-   addContactButton.addEventListener('click', async () => {
+   // Function to handle adding a contact (extracted for reuse)
+   async function handleAddContact() {
         const name = contactNameInput.value.trim();
         const email = contactEmailInput.value.trim();
-        // Get employer and url values
-        const employer = document.getElementById('contact-employer').value.trim();
-        const url = document.getElementById('contact-url').value.trim();
-
+        const employer = contactEmployerInput.value.trim(); // Use the reference
+        const url = contactUrlInput.value.trim(); // Use the reference
 
         // Basic email validation
         if (!email.includes('@') || !email.includes('.')) {
@@ -251,20 +252,31 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         if (name && email) {
-            // Pass employer and url to saveContact
             const saved = await saveContact(name, email, employer, url);
             if (saved) {
-                // Pass employer and url to displayContact
-                displayContact(name, email, employer, url); // Display immediately
-                // Clear inputs, including new ones
+                displayContact(name, email, employer, url);
                 contactNameInput.value = '';
                 contactEmailInput.value = '';
-                document.getElementById('contact-employer').value = '';
-                document.getElementById('contact-url').value = '';
+                contactEmployerInput.value = ''; // Clear using reference
+                contactUrlInput.value = ''; // Clear using reference
             }
         } else {
             alert('Please enter both name and email.');
         }
+   }
+
+   // Add contact button listener
+   addContactButton.addEventListener('click', handleAddContact);
+
+   // Add keydown listener to input fields for Enter key
+   const contactInputs = [contactNameInput, contactEmailInput, contactEmployerInput, contactUrlInput];
+   contactInputs.forEach(input => {
+       input.addEventListener('keydown', (event) => {
+           if (event.key === 'Enter') {
+               event.preventDefault(); // Prevent potential default form submission
+               handleAddContact(); // Call the shared add contact function
+           }
+       });
    });
 
    // --- Initial Load ---
