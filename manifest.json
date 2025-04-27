@@ -5,7 +5,8 @@
   "description": "Helps manage links and contacts for job applications.",
   "permissions": [
     "storage",
-    "sidePanel" 
+    "sidePanel",
+    "tabs"
   ],
 
   "side_panel": { 

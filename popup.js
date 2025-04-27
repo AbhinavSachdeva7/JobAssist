@@ -150,7 +150,25 @@ document.addEventListener('DOMContentLoaded', function() {
   const CONTACTS_STORAGE_KEY = 'jobAppHelperContacts';
 
   // --- Show/Hide Add Contact Form Logic ---
-  showAddContactFormButton.addEventListener('click', () => {
+  showAddContactFormButton.addEventListener('click', async () => { // Make the listener async
+    // Get the current active tab
+    try { // Add error handling for the async operation
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      if (tab && tab.url) {
+        // Check if the URL looks like a LinkedIn profile URL
+        if (tab.url.startsWith('https://www.linkedin.com/in/')) {
+          contactUrlInput.value = tab.url; // Pre-fill the URL field
+        } else {
+          contactUrlInput.value = ''; // Clear if not a LinkedIn URL
+        }
+      } else {
+        contactUrlInput.value = ''; // Clear if no tab or URL found
+      }
+    } catch (error) {
+        console.error("Error getting current tab:", error);
+        contactUrlInput.value = ''; // Clear on error
+    }
+
     addContactFormDiv.style.display = 'block'; // Show the form
     showAddContactFormButton.style.display = 'none'; // Hide the 'Add New Contact' button
   });
