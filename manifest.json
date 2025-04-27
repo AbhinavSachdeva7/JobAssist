@@ -1,0 +1,13 @@
+{
+  "manifest_version": 3,
+  "name": "Job Application Helper",
+  "version": "1.0",
+  "description": "Helps manage links and contacts for job applications.",
+  "permissions": [
+    "storage",
+    "activeTab"
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  }
+}

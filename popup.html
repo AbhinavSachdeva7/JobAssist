@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Job Application Helper</title>
+  <link rel="stylesheet" href="bootstrap.min.css"> <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+
+  <div class="tabs">
+    <button class="tab-button active" data-tab="quick-links">Quick Links</button>
+    <button class="tab-button" data-tab="contacts">Contacts</button>
+  </div>
+
+  <div id="quick-links" class="tab-content active">
+    <button id="linkedin"><img src="linkedin.svg" alt="LinkedIn Logo"> LinkedIn</button>
+    <button id="website"><img src="globe-americas.svg" alt="Website Logo"> Personal Website</button>
+    <button id="github"><img src="github.svg" alt="GitHub Logo"> GitHub</button>
+  </div>
+
+  <div id="contacts" class="tab-content">
+    <h3>Add New Contact</h3>
+    <input type="text" id="contact-name" placeholder="Name">
+    <input type="email" id="contact-email" placeholder="Email">
+    <button id="add-contact">Add Contact</button>
+    <hr>
+    <h3>Saved Contacts</h3>
+    <div id="contacts-list">
+      <!-- Contacts will be loaded here by JS -->
+    </div>
+  </div>
+
+  <!-- Optional: Bootstrap JS if needed for components -->
+  <!-- <script src="bootstrap.bundle.min.js"></script> -->
+  <script src="popup.js"></script>
+</body>
+</html>

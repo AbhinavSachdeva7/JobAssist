@@ -1,0 +1,149 @@
+/* Define the Poppins font */
+@font-face {
+  font-family: 'Poppins';
+  src: url('fonts/Poppins-Regular.woff2') format('woff2'); /* Path to your local font file */
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Poppins';
+  src: url('fonts/Poppins-Bold.woff2') format('woff2'); /* Path to your local bold font file */
+  font-weight: 700;
+  font-style: normal;
+}
+
+body {
+  font-family: 'Poppins', sans-serif; /* Use Poppins, fallback to sans-serif */
+  width: 300px; /* Adjust width as needed */
+  padding: 10px;
+  background-color: #ffffff; /* White background */
+  color: #333333; /* Dark grey text */
+}
+
+.tabs {
+  display: flex;
+  border-bottom: 1px solid #e0e0e0; /* Lighter border */
+  margin-bottom: 10px;
+}
+
+.tab-button {
+  padding: 10px 15px;
+  cursor: pointer;
+  border: none;
+  background-color: transparent;
+  border-bottom: 2px solid transparent; /* For active indicator */
+  margin-right: 5px;
+  font-size: 1em;
+  color: #333333; /* Dark grey text */
+}
+
+.tab-button.active {
+  border-bottom-color: #6a0dad; /* Purple active tab indicator */
+  font-weight: bold;
+  color: #6a0dad; /* Keep active tab purple */
+}
+
+.tab-button:hover {
+  background-color: #f2e6ff; /* Light purple hover */
+}
+
+.tab-content {
+  display: none; /* Hide content by default */
+}
+
+.tab-content.active {
+  display: block; /* Show active content */
+}
+
+/* General button styling */
+button {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 8px;
+  border: 1px solid #d1b3e6; /* Lighter purple border */
+  border-radius: 4px;
+  background-color: #ffffff; /* White background */
+  color: #333333; /* Dark grey text */
+  cursor: pointer;
+  text-align: left;
+  font-size: 1em;
+  transition: background-color 0.2s ease, border-color 0.2s ease; /* Smooth transition */
+}
+
+button:hover {
+  background-color: #f2e6ff; /* Light purple hover */
+  border-color: #6a0dad; /* Darker purple border on hover */
+}
+
+/* Specific button styling */
+#quick-links button {
+  display: flex; /* Use flexbox for icon alignment */
+  align-items: center;
+}
+
+#quick-links button img { /* Changed selector back from i to img */
+  margin-right: 8px; /* Space between icon and text */
+  width: 16px; /* Adjust icon size as needed */
+  height: 16px;
+}
+
+#contacts h3 {
+  margin-top: 15px;
+  margin-bottom: 5px;
+  font-size: 1.1em;
+  color: #333333; /* Dark grey headings */
+}
+
+#contacts input[type="text"],
+#contacts input[type="email"] {
+  width: calc(100% - 22px); /* Account for padding and border */
+  padding: 8px;
+  margin-bottom: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+#contacts button#add-contact {
+  background-color: #6a0dad; /* Purple */
+  color: white;
+  border: none;
+  text-align: center;
+}
+#contacts button#add-contact:hover {
+  background-color: #4c0a7d; /* Darker purple */
+}
+
+#contacts-list div {
+  background-color: #f9f9f9; /* Slightly off-white for list items */
+  padding: 8px;
+  margin-bottom: 5px;
+  border: 1px solid #e0e0e0; /* Lighter border */
+  border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.contact-info {
+  flex-grow: 1;
+  margin-right: 10px;
+  color: #333333; /* Dark grey contact info text */
+}
+
+.email-button {
+  padding: 5px 10px !important; /* Override general button padding */
+  background-color: #8a2be2 !important; /* Lighter Purple for email button */
+  color: white !important;
+  border: none !important;
+  border-radius: 3px !important;
+  cursor: pointer !important;
+  width: auto !important; /* Override width */
+  text-align: center !important;
+  font-size: 0.9em !important; /* Slightly smaller font */
+}
+
+.email-button:hover {
+  background-color: #6a0dad !important; /* Darker purple on hover */
+}
