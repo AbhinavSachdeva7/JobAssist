@@ -1002,3 +1002,21 @@ textarea:focus {
   background-color: var(--primary-dark);
 }
 
+/* Tab Button Icon Styling */
+.tab-button svg {
+  margin-right: 6px;
+  margin-top: 0px; /* Changed from 2px to 0px to move icons up */
+  vertical-align: text-bottom;
+  color: inherit; /* Inherits color from parent (tab button) */
+  width: 18px;
+  height: 18px;
+}
+
+/* Adjust tab button padding to accommodate icons */
+.tab-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 15px;
+}
+
