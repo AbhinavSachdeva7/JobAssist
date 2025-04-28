@@ -842,11 +842,19 @@ body.editing-templates .links-display {
   padding-top: 16px;
 }
 
+.section-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
 .section-title {
   font-size: 16px;
   font-weight: 600;
   color: var(--text);
-  margin-bottom: 12px;
+  margin: 0;
 }
 
 .section-subtitle {
@@ -890,6 +898,17 @@ body.editing-templates .links-display {
   transform: translateY(-1px);
 }
 
+.template-subject {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--primary);
+  display: block;
+  margin-bottom: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .template-preview {
   font-size: 12px;
   color: var(--text-light);
@@ -913,28 +932,7 @@ body.editing-templates .links-display {
   background-color: #f2e6ff;
 }
 
-/* Style for textareas in edit mode */
-textarea {
-  width: 100%;
-  padding: 10px 12px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  font-family: inherit;
-  font-size: 13px;
-  color: var(--text);
-  background-color: var(--background);
-  transition: all 0.2s ease;
-  resize: vertical;
-  min-height: 100px;
-}
-
-textarea:focus {
-  border-color: var(--primary);
-  background-color: white;
-  box-shadow: 0 0 0 3px rgba(106, 13, 173, 0.08);
-}
-
-/* Template Content Modal */
+/* Template Modal Styling */
 .template-modal-overlay {
   position: fixed;
   top: 0;
@@ -942,10 +940,10 @@ textarea:focus {
   right: 0;
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.5);
-  z-index: 1000;
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
+  z-index: 1000;
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.3s ease, visibility 0.3s ease;
@@ -958,24 +956,18 @@ textarea:focus {
 
 .template-modal {
   background-color: white;
-  border-radius: 10px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   width: 90%;
   max-width: 500px;
-  max-height: 80vh;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
-  transform: translateY(20px);
-  transition: transform 0.3s ease;
-  overflow: hidden;
-}
-
-.template-modal-overlay.show .template-modal {
-  transform: translateY(0);
+  max-height: 90vh;
 }
 
 .template-modal-header {
-  padding: 15px;
+  padding: 12px 15px;
   border-bottom: 1px solid var(--border);
   display: flex;
   justify-content: space-between;
@@ -985,17 +977,18 @@ textarea:focus {
 .template-modal-title {
   font-size: 16px;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--text);
   margin: 0;
 }
 
 .template-modal-close {
   background: none;
   border: none;
-  font-size: 20px;
+  font-size: 22px;
+  line-height: 1;
+  padding: 0 6px;
   cursor: pointer;
   color: var(--text-light);
-  padding: 0 5px;
 }
 
 .template-modal-body {
@@ -1005,11 +998,39 @@ textarea:focus {
 }
 
 .template-content {
-  font-family: 'Inter', sans-serif;
+  white-space: pre-wrap;
   font-size: 14px;
   line-height: 1.6;
-  white-space: pre-wrap;
   color: var(--text);
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-radius: 6px;
+}
+
+/* Template Modal with Subject and Body */
+.template-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-light);
+  margin-bottom: 5px;
+}
+
+.template-subject-section {
+  margin-bottom: 15px;
+}
+
+.template-subject-content {
+  font-weight: 500;
+  color: var(--primary);
+  font-size: 15px;
+  padding: 8px 12px;
+  background-color: #f9f9f9;
+  border-radius: 6px;
+  border-left: 3px solid var(--primary);
+}
+
+.template-body-section {
+  margin-bottom: 15px;
 }
 
 .template-modal-footer {
@@ -1017,6 +1038,7 @@ textarea:focus {
   border-top: 1px solid var(--border);
   display: flex;
   justify-content: flex-end;
+  gap: 10px;
 }
 
 .copy-template-button {
@@ -1025,56 +1047,18 @@ textarea:focus {
   border: none;
   border-radius: 6px;
   padding: 8px 16px;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .copy-template-button:hover {
   background-color: var(--primary-dark);
-}
-
-/* Tab Button Icon Styling */
-.tab-button svg {
-  margin-right: 6px;
-  margin-top: 0px; /* Changed from 2px to 0px to move icons up */
-  vertical-align: text-bottom;
-  color: inherit; /* Inherits color from parent (tab button) */
-  width: 18px;
-  height: 18px;
-}
-
-/* Adjust tab button padding to accommodate icons */
-.tab-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 12px 15px;
-}
-
-/* Section Header with Edit Button */
-.section-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 15px;
-}
-
-.section-header .section-title {
-  margin-bottom: 0;
-  flex: 1;
-}
-
-.section-header .icon-button {
-  margin-left: 10px;
-  padding: 6px 10px;
-  border-radius: 6px;
-  transition: all 0.2s ease;
-}
-
-.section-header .icon-button:hover {
-  background-color: rgba(106, 13, 173, 0.1);
   transform: translateY(-1px);
+}
+
+.copy-all-button {
+  background-color: var(--primary-dark);
 }
 

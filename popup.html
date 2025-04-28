@@ -99,7 +99,8 @@
             </svg>
             <div class="link-text">
               <span class="link-title">Follow-up Email</span>
-              <span class="template-preview">Thank you for the opportunity to interview...</span>
+              <span class="template-subject"></span>
+              <span class="template-preview"></span>
             </div>
           </div>
           <div class="email-template-item" data-template-key="introduction">
@@ -108,7 +109,8 @@
             </svg>
             <div class="link-text">
               <span class="link-title">Introduction Email</span>
-              <span class="template-preview">I'm reaching out to express my interest...</span>
+              <span class="template-subject"></span>
+              <span class="template-preview"></span>
             </div>
           </div>
         </div>
@@ -141,11 +143,19 @@
           <button id="cancel-templates-button" class="icon-button">Cancel</button>
         </div>
         <div class="form-group">
-          <label for="follow-up-edit">Follow-up Email Template</label>
+          <label for="follow-up-subject-edit">Follow-up Email Subject</label>
+          <input type="text" id="follow-up-subject-edit" placeholder="Enter your follow-up email subject here...">
+        </div>
+        <div class="form-group">
+          <label for="follow-up-edit">Follow-up Email Body</label>
           <textarea id="follow-up-edit" placeholder="Enter your follow-up email template here..." rows="4"></textarea>
         </div>
         <div class="form-group">
-          <label for="introduction-edit">Introduction Email Template</label>
+          <label for="introduction-subject-edit">Introduction Email Subject</label>
+          <input type="text" id="introduction-subject-edit" placeholder="Enter your introduction email subject here...">
+        </div>
+        <div class="form-group">
+          <label for="introduction-edit">Introduction Email Body</label>
           <textarea id="introduction-edit" placeholder="Enter your introduction email template here..." rows="4"></textarea>
         </div>
       </div>

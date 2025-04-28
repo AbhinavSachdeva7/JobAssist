@@ -10,7 +10,9 @@ const QuickLinks = {
     github: 'https://github.com/Abdullah-Malik'
   },
   defaultTemplates: {
-    'follow-up': `Dear [Hiring Manager's Name],
+    'follow-up': {
+      subject: 'Following up on [Position] interview at [Company]',
+      body: `Dear [Hiring Manager's Name],
 
 Thank you for the opportunity to interview for the [Position] role at [Company Name]. I enjoyed our conversation and learning more about the team and position.
 
@@ -19,8 +21,11 @@ I'm writing to follow up on our discussion about [specific topic discussed]. As 
 Please let me know if you need any additional information from me. I'm excited about the possibility of joining [Company Name] and contributing to [specific goal or project].
 
 Best regards,
-[Your Name]`,
-    'introduction': `Dear [Hiring Manager's Name],
+[Your Name]`
+    },
+    'introduction': {
+      subject: '[Your Name] - Application for [Position] at [Company]',
+      body: `Dear [Hiring Manager's Name],
 
 I'm reaching out to express my interest in the [Position] role at [Company Name]. With [number] years of experience in [relevant field] and a background in [relevant background], I believe I would be a great fit for this position.
 
@@ -35,6 +40,7 @@ Thank you for your consideration.
 
 Best regards,
 [Your Name]`
+    }
   },
   
   init() {
@@ -53,8 +59,12 @@ Best regards,
     this.linkedinEditInput = document.getElementById('linkedin-edit');
     this.websiteEditInput = document.getElementById('website-edit');
     this.githubEditInput = document.getElementById('github-edit');
+    
+    this.followUpSubjectEditInput = document.getElementById('follow-up-subject-edit');
     this.followUpEditInput = document.getElementById('follow-up-edit');
+    this.introductionSubjectEditInput = document.getElementById('introduction-subject-edit');
     this.introductionEditInput = document.getElementById('introduction-edit');
+    
     this.linkItems = document.querySelectorAll('.link-item');
     this.templateItems = document.querySelectorAll('.email-template-item');
     
@@ -92,9 +102,9 @@ Best regards,
     this.templateItems.forEach(item => {
       item.addEventListener('click', (event) => {
         const key = item.dataset.templateKey;
-        const templateText = this.currentTemplates[key];
-        if (templateText) {
-          this.showTemplateModal(key, templateText, item);
+        const template = this.currentTemplates[key];
+        if (template) {
+          this.showTemplateModal(key, template, item);
         } else {
           alert(`${item.querySelector('.link-title').textContent} is not set. Click Edit to add it.`);
         }
@@ -118,6 +128,18 @@ Best regards,
   async loadEmailTemplates() {
     const result = await chrome.storage.local.get(this.TEMPLATES_KEY);
     this.currentTemplates = result[this.TEMPLATES_KEY] || { ...this.defaultTemplates };
+    
+    // Handle migration from old format to new format with subjects
+    Object.keys(this.currentTemplates).forEach(key => {
+      if (typeof this.currentTemplates[key] === 'string') {
+        // Convert old format (string) to new format (object with subject and body)
+        this.currentTemplates[key] = {
+          subject: key === 'follow-up' ? 'Following up on interview' : 'Application for position',
+          body: this.currentTemplates[key]
+        };
+      }
+    });
+    
     this.updateTemplateItems();
   },
   
@@ -139,12 +161,23 @@ Best regards,
   updateTemplateItems() {
     this.templateItems.forEach(item => {
       const key = item.dataset.templateKey;
+      const template = this.currentTemplates[key];
+      
+      const subjectSpan = item.querySelector('.template-subject');
       const previewSpan = item.querySelector('.template-preview');
-      if (previewSpan && this.currentTemplates[key]) {
-        // Create a preview of the template (first 30 characters)
-        const templateText = this.currentTemplates[key];
-        const previewText = templateText.substring(0, 30) + (templateText.length > 30 ? '...' : '');
-        previewSpan.textContent = previewText;
+      
+      if (template) {
+        // Update subject
+        if (subjectSpan) {
+          subjectSpan.textContent = `Subject: ${template.subject}`;
+        }
+        
+        // Update preview of body
+        if (previewSpan) {
+          const templateBody = template.body;
+          const previewText = templateBody.substring(0, 30) + (templateBody.length > 30 ? '...' : '');
+          previewSpan.textContent = previewText;
+        }
       }
     });
   },
@@ -177,20 +210,56 @@ Best regards,
     const modalBody = document.createElement('div');
     modalBody.className = 'template-modal-body';
     
-    const templateContent = document.createElement('div');
-    templateContent.className = 'template-content';
+    // Create subject section
+    const subjectSection = document.createElement('div');
+    subjectSection.className = 'template-subject-section';
     
-    modalBody.appendChild(templateContent);
+    const subjectLabel = document.createElement('div');
+    subjectLabel.className = 'template-label';
+    subjectLabel.textContent = 'Subject:';
+    
+    const subjectContent = document.createElement('div');
+    subjectContent.className = 'template-subject-content';
+    
+    subjectSection.appendChild(subjectLabel);
+    subjectSection.appendChild(subjectContent);
+    
+    // Create body section
+    const bodySection = document.createElement('div');
+    bodySection.className = 'template-body-section';
+    
+    const bodyLabel = document.createElement('div');
+    bodyLabel.className = 'template-label';
+    bodyLabel.textContent = 'Body:';
+    
+    const bodyContent = document.createElement('div');
+    bodyContent.className = 'template-content';
+    
+    bodySection.appendChild(bodyLabel);
+    bodySection.appendChild(bodyContent);
+    
+    modalBody.appendChild(subjectSection);
+    modalBody.appendChild(bodySection);
     
     // Create modal footer
     const modalFooter = document.createElement('div');
     modalFooter.className = 'template-modal-footer';
     
-    const copyButton = document.createElement('button');
-    copyButton.className = 'copy-template-button';
-    copyButton.textContent = 'Copy to Clipboard';
+    const copySubjectButton = document.createElement('button');
+    copySubjectButton.className = 'copy-template-button';
+    copySubjectButton.textContent = 'Copy Subject';
     
-    modalFooter.appendChild(copyButton);
+    const copyBodyButton = document.createElement('button');
+    copyBodyButton.className = 'copy-template-button';
+    copyBodyButton.textContent = 'Copy Body';
+    
+    const copyAllButton = document.createElement('button');
+    copyAllButton.className = 'copy-template-button copy-all-button';
+    copyAllButton.textContent = 'Copy All';
+    
+    modalFooter.appendChild(copySubjectButton);
+    modalFooter.appendChild(copyBodyButton);
+    modalFooter.appendChild(copyAllButton);
     
     // Assemble the modal
     modal.appendChild(modalHeader);
@@ -206,22 +275,37 @@ Best regards,
       overlay: modalOverlay,
       container: modal,
       title: modalTitle,
-      content: templateContent,
-      copyButton: copyButton
+      subjectContent: subjectContent,
+      bodyContent: bodyContent,
+      copySubjectButton: copySubjectButton,
+      copyBodyButton: copyBodyButton,
+      copyAllButton: copyAllButton
     };
   },
   
-  showTemplateModal(key, text, item) {
+  showTemplateModal(key, template, item) {
     // Set the title and content
     const title = item.querySelector('.link-title').textContent;
     this.templateModal.title.textContent = title;
-    this.templateModal.content.textContent = text;
+    this.templateModal.subjectContent.textContent = template.subject;
+    this.templateModal.bodyContent.textContent = template.body;
     
-    // Set up the copy button
-    const copyButton = this.templateModal.copyButton;
+    // Set up the copy buttons
     const self = this;
-    copyButton.onclick = function() {
-      self.copyToClipboard(text, item);
+    
+    this.templateModal.copySubjectButton.onclick = function() {
+      self.copyToClipboard(template.subject, item);
+      self.showToast('Subject copied to clipboard!');
+    };
+    
+    this.templateModal.copyBodyButton.onclick = function() {
+      self.copyToClipboard(template.body, item);
+      self.showToast('Body copied to clipboard!');
+    };
+    
+    this.templateModal.copyAllButton.onclick = function() {
+      const allText = `Subject: ${template.subject}\n\n${template.body}`;
+      self.copyToClipboard(allText, item);
       self.closeTemplateModal();
     };
     
@@ -327,8 +411,13 @@ Best regards,
   
   enterTemplatesEditMode() {
     // Populate email template inputs
-    this.followUpEditInput.value = this.currentTemplates['follow-up'] || '';
-    this.introductionEditInput.value = this.currentTemplates['introduction'] || '';
+    const followUpTemplate = this.currentTemplates['follow-up'];
+    const introTemplate = this.currentTemplates['introduction'];
+    
+    this.followUpSubjectEditInput.value = followUpTemplate.subject || '';
+    this.followUpEditInput.value = followUpTemplate.body || '';
+    this.introductionSubjectEditInput.value = introTemplate.subject || '';
+    this.introductionEditInput.value = introTemplate.body || '';
 
     // Toggle visibility
     document.body.classList.add('editing-templates');
@@ -373,8 +462,14 @@ Best regards,
   
   async saveTemplates() {
     const newTemplates = {
-      'follow-up': this.followUpEditInput.value.trim(),
-      'introduction': this.introductionEditInput.value.trim()
+      'follow-up': {
+        subject: this.followUpSubjectEditInput.value.trim(),
+        body: this.followUpEditInput.value.trim()
+      },
+      'introduction': {
+        subject: this.introductionSubjectEditInput.value.trim(),
+        body: this.introductionEditInput.value.trim()
+      }
     };
 
     try {
