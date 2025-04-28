@@ -85,10 +85,10 @@ const ContactManager = {
       <strong class="contact-name">${name}</strong>
       <span class="contact-email">${email}</span>
       ${employer ? `<span class="contact-employer">Employer: ${employer}</span>` : ''}
-      ${url ? `<span class="copyable-url" data-url="${url}" style="cursor: pointer; color: var(--primary); font-size: 12px; display: block; margin-top: 4px; margin-bottom: 4px; width: fit-content; text-decoration: none; transition: all 0.2s ease;">${url}</span>` : ''}
+      ${url ? `<span class="copyable-url" data-url="${url}" style="cursor: pointer; color: var(--primary); font-size: 12px; display: block; margin-top: 4px; margin-bottom: 4px; width: 100%; overflow: hidden; text-overflow: ellipsis; text-decoration: none; transition: all 0.2s ease;">${url}</span>` : ''}
       <div style="display: flex; gap: 10px; margin-top: 10px; border: none; background: transparent; box-shadow: none; padding: 0;">
-        <button class="email-button" data-email="${email}" title="Email ${name}" style="flex: 1; max-width: 80px;">Email</button>
-        <button class="delete-button" data-email="${email}" title="Delete ${name}" style="flex: 1; max-width: 80px;">Delete</button>
+        <button class="email-button" data-email="${email}" title="Email ${name}" style="flex: 1;">Email</button>
+        <button class="delete-button" data-email="${email}" title="Delete ${name}" style="flex: 1;">Delete</button>
       </div>
     `;
 
@@ -115,20 +115,30 @@ const ContactManager = {
           // Store original text and URL
           const originalText = e.target.textContent;
           
-          // Change text to "Copied!"
-          e.target.textContent = "Copied!";
-          e.target.style.color = "#4caf50"; // Green color
-          
-          // Add a subtle animation
+          // Simple swap with fade effect, maintaining left alignment
           e.target.style.transition = "all 0.2s ease";
-          e.target.style.transform = "scale(1.05)";
+          e.target.style.opacity = "0";
           
-          // Revert back after 1.5 seconds
           setTimeout(() => {
-            e.target.textContent = originalText;
-            e.target.style.color = "";
-            e.target.style.transform = "scale(1)";
-          }, 1500);
+            // Change text to "Copied!" with purple color to match theme
+            e.target.textContent = "Copied!";
+            e.target.style.color = "var(--primary)"; // Purple color from theme
+            e.target.style.opacity = "1";
+            
+            // Revert back after 1.5 seconds
+            setTimeout(() => {
+              e.target.style.opacity = "0";
+              
+              setTimeout(() => {
+                e.target.textContent = originalText;
+                e.target.style.color = "";
+                
+                setTimeout(() => {
+                  e.target.style.opacity = "1";
+                }, 50);
+              }, 200);
+            }, 1300);
+          }, 200);
         }).catch(err => {
           console.error('Failed to copy: ', err);
         });
@@ -186,6 +196,116 @@ const ContactManager = {
         // Pre-fill the URL field if it's a LinkedIn profile
         if (tab.url.startsWith('https://www.linkedin.com/in/')) {
           this.contactUrlInput.value = tab.url;
+          try {
+            console.log("Attempting to find company name span and process text...");
+            // Execute script in the LinkedIn tab
+            const results = await chrome.scripting.executeScript({
+              target: { tabId: tab.id },
+              func: () => {
+                
+                // --- Steps 1-4: Find the listContainerDiv (Kept as context is needed) ---
+                let experienceHeader = null;
+                const potentialHeaderSelectors = ['h2', 'h3', 'span', 'div']; 
+                for (const selector of potentialHeaderSelectors) { /* ... find header ... */ 
+                  const elements = document.querySelectorAll(selector);
+                  for (const element of elements) {
+                    if (element.innerText && element.innerText.trim().split('\n')[0] === 'Experience') { 
+                      experienceHeader = element;
+                      break; 
+                    }
+                  }
+                  if (experienceHeader) break; 
+                }
+                if (!experienceHeader) { console.log("DEBUG: Could not find 'Experience' header."); return ''; } // Return empty string
+                
+                const experienceSection = experienceHeader.closest(/* ... section selectors ... */
+                  'section.artdeco-card, section[data-section="experience"], div[data-view-name="profile-card-layout"], #experience-section, #experience, section'
+                );
+                if (!experienceSection) { console.log("DEBUG: Could not find parent section."); return ''; }
+                
+                const headerContainerDiv = experienceHeader.closest('section > div'); 
+                if (!headerContainerDiv) { console.log("DEBUG: Could not find header container div."); return ''; }
+                
+                let listContainerDiv = headerContainerDiv.nextElementSibling;
+                while (listContainerDiv && listContainerDiv.tagName !== 'DIV') {
+                  listContainerDiv = listContainerDiv.nextElementSibling;
+                }
+                if (!listContainerDiv) { console.log("DEBUG: Could not find the list container div."); return ''; }
+                console.log("DEBUG: Found list container div:", listContainerDiv);
+          
+                // --- Step 5: Find the *first* SPAN using the BROAD XPath ---
+                let companyInfoSpan = null;
+                try {
+                    const middleDot = '\u00B7'; // Unicode escape
+                    // Using the BROAD XPath relative to listContainerDiv
+                    const xpathExpression = `.//span[contains(., '${middleDot}')]`; 
+                    console.log("DEBUG: Executing BROAD XPath:", xpathExpression);
+          
+                    const xpathResult = document.evaluate(
+                        xpathExpression,
+                        listContainerDiv,           // Context Node
+                        null,                       // Namespace Resolver
+                        XPathResult.FIRST_ORDERED_NODE_TYPE, 
+                        null                        
+                    );
+                    companyInfoSpan = xpathResult.singleNodeValue; 
+                } catch (e) {
+                    console.error("DEBUG: Error executing XPath:", e);
+                    return ''; // Return empty string on error
+                }
+                
+                // --- Step 6: Process the found span using indexOf and substring ---
+                if (companyInfoSpan) { 
+                    console.log("DEBUG: Found target span element (broad XPath):", companyInfoSpan);
+                    // Ensure innerText exists before trimming
+                    const rawText = companyInfoSpan.innerText ? companyInfoSpan.innerText.trim() : '';
+                    console.log("DEBUG: Raw innerText:", rawText);
+
+                    const middleDot = '\u00B7';
+                    // Find the index of the FIRST middle dot (use literal or escape)
+                    const firstDotIndex = rawText.indexOf(`${middleDot}`); // Using the literal
+                    // Or safer: const firstDotIndex = rawText.indexOf('\u00B7');
+          
+                    let companyName = ''; // Default to empty
+          
+                    if (firstDotIndex !== -1) {
+                        // If a dot is found, take the substring from the start up to the dot
+                        companyName = rawText.substring(0, firstDotIndex).trim();
+                        console.log("DEBUG: Extracted company name (using indexOf/substring):", companyName);
+                    } else {
+                        // If no middle dot is found in the text, we might have the wrong span entirely.
+                        // Decide whether to return the raw text or nothing. Returning nothing is safer.
+                        console.log(`DEBUG: Middle dot ('·') not found in raw text: "${rawText}". Cannot extract company name reliably.`);
+                        companyName = ''; // Keep it empty
+                    }
+          
+                    return companyName; // Return the extracted name or empty string
+          
+                } else {
+                    console.log("DEBUG: Could not find any span containing '\\u00B7' using broad XPath.");
+                    return ''; // Return empty string if not found
+                }
+              } // end of func
+            }); // end of executeScript
+          
+            // --- Update Input Field ---
+            // Check if the script returned a non-null result (empty string is valid)
+            if (results && results[0] && results[0].result !== null) {
+              const extractedCompanyName = results[0].result;
+              // Log the result, even if it's an empty string
+              console.log("Script executed, extracted company name:", extractedCompanyName); 
+              // Assign the potentially empty string to the input field
+              this.contactEmployerInput.value = extractedCompanyName; 
+            } else {
+              console.log("Script execution failed or did not return a result (returned null).");
+              this.contactEmployerInput.value = ''; // Clear the field
+            }
+          
+          } catch (err) {
+            // Log errors related to injecting the script itself
+            console.error("Error injecting script or processing results:", err);
+            this.contactEmployerInput.value = ''; // Clear the field on error
+          }
         } else {
           this.contactUrlInput.value = '';
         }

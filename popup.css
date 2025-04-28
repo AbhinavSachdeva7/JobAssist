@@ -38,7 +38,9 @@ html, body {
 }
 
 body {
-  width: 360px;
+  width: 100%; /* Changed from fixed 360px to be responsive */
+  min-width: 300px; /* Minimum width for usability */
+  max-width: 100%; /* Ensure it doesn't overflow the available space */
   min-height: 300px;
   padding: 0;
   overflow-x: hidden;
@@ -574,9 +576,8 @@ hr {
   font-size: 12px;
   font-weight: 500;
   flex: 1;
-  width: 80px;
+  min-width: 60px; /* Minimum width instead of fixed width */
   height: 34px;
-  max-width: 80px;
   text-align: center;
   transition: all 0.2s ease;
   display: flex;
@@ -747,5 +748,57 @@ body:not(.editing-links) .edit-mode-active {
 
 .contact-deleted-feedback .delete-icon {
   animation: deleteIcon 0.5s ease;
+}
+
+/* Responsive adjustments */
+@media (max-width: 320px) {
+  .app-container {
+    padding: 12px;
+  }
+  
+  #contacts-list div {
+    padding: 12px;
+  }
+  
+  .tab-button {
+    padding: 10px 0;
+    font-size: 13px;
+  }
+  
+  .contact-name {
+    font-size: 13px;
+  }
+  
+  .contact-email, .contact-employer {
+    font-size: 11px;
+  }
+  
+  .email-button, .delete-button {
+    padding: 6px 8px;
+    font-size: 11px;
+    height: 30px;
+  }
+}
+
+@media (min-width: 480px) {
+  .app-container {
+    padding: 20px;
+  }
+  
+  body {
+    font-size: 16px;
+  }
+  
+  .contact-name {
+    font-size: 15px;
+  }
+  
+  .contact-email, .contact-employer {
+    font-size: 13px;
+  }
+  
+  .email-button, .delete-button {
+    padding: 8px 15px;
+  }
 }
 

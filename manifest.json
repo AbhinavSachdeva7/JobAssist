@@ -6,7 +6,11 @@
   "permissions": [
     "storage",
     "sidePanel",
-    "tabs"
+    "tabs",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://*.linkedin.com/*"
   ],
   "side_panel": { 
     "default_path": "popup.html"
