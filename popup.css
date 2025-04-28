@@ -74,6 +74,14 @@ body {
   margin-bottom: 0;
 }
 
+/* Adding style to shift only the SVG icons inside tab buttons upward */
+.tab-button svg {
+  position: relative;
+  top: -1px; /* Negative value moves the icon upward */
+  margin-bottom: 1px; /* Add a bit of margin to balance the layout */
+  
+}
+
 .tab-button::after {
   content: '';
   position: absolute;
