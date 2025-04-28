@@ -910,7 +910,7 @@ body.editing-templates .links-display {
 
 .template-subject {
   font-weight: 500;
-  color: var(--primary);
+  color: var(--text); /* Changed from var(--text-light) to var(--text) for darker grey */
   margin-bottom: 3px;
 }
 
@@ -1123,7 +1123,6 @@ body.editing-templates .links-display {
   padding: 15px;
   background-color: var(--background-light);
   border-radius: 8px;
-  border-left: 3px solid var(--primary-light);
 }
 
 /* Template Modal with Subject and Body */
@@ -1140,12 +1139,11 @@ body.editing-templates .links-display {
 
 .template-subject-content {
   font-weight: 500;
-  color: var(--primary);
+  color: var(--text); /* Changed from var(--text-light) to var(--text) for darker grey */
   font-size: 16px;
   padding: 12px 15px;
   background-color: var(--background-light);
   border-radius: 8px;
-  border-left: 3px solid var(--primary);
 }
 
 .template-body-section {

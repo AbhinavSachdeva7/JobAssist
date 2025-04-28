@@ -253,13 +253,8 @@ Best regards,
     copyBodyButton.className = 'copy-template-button';
     copyBodyButton.textContent = 'Copy Body';
     
-    const copyAllButton = document.createElement('button');
-    copyAllButton.className = 'copy-template-button copy-all-button';
-    copyAllButton.textContent = 'Copy All';
-    
     modalFooter.appendChild(copySubjectButton);
     modalFooter.appendChild(copyBodyButton);
-    modalFooter.appendChild(copyAllButton);
     
     // Assemble the modal
     modal.appendChild(modalHeader);
@@ -278,8 +273,7 @@ Best regards,
       subjectContent: subjectContent,
       bodyContent: bodyContent,
       copySubjectButton: copySubjectButton,
-      copyBodyButton: copyBodyButton,
-      copyAllButton: copyAllButton
+      copyBodyButton: copyBodyButton
     };
   },
   
@@ -308,13 +302,6 @@ Best regards,
       self.copyToClipboard(template.body, null);
       self.closeTemplateModal();
       self.showToast('Body copied to clipboard!');
-    };
-    
-    this.templateModal.copyAllButton.onclick = function() {
-      const allText = `Subject: ${template.subject}\n\n${template.body}`;
-      self.copyToClipboard(allText, null);
-      self.closeTemplateModal();
-      self.showToast('Email template copied to clipboard!');
     };
     
     // Show the modal with animation
@@ -500,6 +487,11 @@ Best regards,
   
   // Helper for showing toast messages
   showToast(message, type = 'success') {
+    // Empty implementation to remove toast notifications
+    return;
+    
+    // Original implementation commented out
+    /*
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
     toast.textContent = message;
@@ -516,5 +508,6 @@ Best regards,
         document.body.removeChild(toast);
       }, 300);
     }, 3000);
+    */
   }
 };
