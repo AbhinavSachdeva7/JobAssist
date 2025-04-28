@@ -64,25 +64,12 @@
             Edit
           </button>
         </div>
-        <div id="linkedin-link" class="link-item" data-link-key="linkedin">
-          <img src="linkedin.svg" alt="LinkedIn Logo" class="link-logo">
-          <div class="link-text">
-            <span class="link-title">LinkedIn</span>
-            <span class="link-url"></span>
-          </div>
-        </div>
-        <div id="website-link" class="link-item" data-link-key="website">
-          <img src="globe-americas.svg" alt="Website Logo" class="link-logo">
-          <div class="link-text">
-            <span class="link-title">Personal Website</span>
-            <span class="link-url"></span>
-          </div>
-        </div>
-        <div id="github-link" class="link-item" data-link-key="github">
-          <img src="github.svg" alt="GitHub Logo" class="link-logo">
-          <div class="link-text">
-            <span class="link-title">GitHub</span>
-            <span class="link-url"></span>
+        
+        <div id="dynamic-links-container">
+          <!-- Dynamic links will be generated here by JS -->
+          <!-- If no links exist, show a placeholder message -->
+          <div id="no-links-message" class="no-links-message" style="display: none;">
+            No links added yet. Click 'Edit' to add your first link.
           </div>
         </div>
         
@@ -126,18 +113,17 @@
           <button id="save-links-button" class="icon-button">Save</button>
           <button id="cancel-links-button" class="icon-button">Cancel</button>
         </div>
-        <div class="form-group">
-          <label for="linkedin-edit">LinkedIn URL</label>
-          <input type="url" id="linkedin-edit" placeholder="https://linkedin.com/in/yourprofile">
+        
+        <div id="dynamic-links-list">
+          <!-- Dynamic link inputs will be generated here -->
         </div>
-        <div class="form-group">
-          <label for="website-edit">Website URL</label>
-          <input type="url" id="website-edit" placeholder="https://yourwebsite.com">
-        </div>
-        <div class="form-group">
-          <label for="github-edit">GitHub URL</label>
-          <input type="url" id="github-edit" placeholder="https://github.com/yourusername">
-        </div>
+        
+        <button id="add-link-button" class="add-link-button">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M8 0a1 1 0 0 1 1 1v6h6a1 1 0 1 1 0 2H9v6a1 1 0 1 1-2 0V9H1a1 1 0 0 1 0-2h6V1a1 1 0 0 1 1-1z"/>
+          </svg>
+          Add New Link
+        </button>
       </div>
       
       <!-- Email Templates Edit Form -->

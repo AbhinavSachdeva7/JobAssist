@@ -2,12 +2,18 @@
 const QuickLinks = {
   STORAGE_KEY: 'jobAppHelperQuickLinks',
   TEMPLATES_KEY: 'jobAppHelperEmailTemplates',
-  currentLinks: {},
+  currentLinks: [],
   currentTemplates: {},
-  defaultLinks: {
-    linkedin: 'https://www.linkedin.com/in/mab-malik/',
-    website: 'https://abdullahmalik.me/',
-    github: 'https://github.com/Abdullah-Malik'
+  defaultLinks: [
+    { id: 'link-1', type: 'linkedin', url: 'https://www.linkedin.com/in/mab-malik/', title: 'LinkedIn' },
+    { id: 'link-2', type: 'website', url: 'https://abdullahmalik.me/', title: 'Personal Website' },
+    { id: 'link-3', type: 'github', url: 'https://github.com/Abdullah-Malik', title: 'GitHub' }
+  ],
+  linkIcons: {
+    linkedin: 'linkedin.svg',
+    github: 'github.svg',
+    website: 'globe-americas.svg',
+    other: 'bi-link-45deg'
   },
   defaultTemplates: {
     'follow-up': {
@@ -51,21 +57,20 @@ Best regards,
     this.cancelLinksButton = document.getElementById('cancel-links-button');
     this.saveTemplatesButton = document.getElementById('save-templates-button');
     this.cancelTemplatesButton = document.getElementById('cancel-templates-button');
+    this.addLinkButton = document.getElementById('add-link-button');
     
     this.linksDisplayDiv = document.querySelector('.links-display');
     this.quickLinksEditDiv = document.querySelector('.quick-links-edit');
     this.templatesEditDiv = document.querySelector('.templates-edit');
-    
-    this.linkedinEditInput = document.getElementById('linkedin-edit');
-    this.websiteEditInput = document.getElementById('website-edit');
-    this.githubEditInput = document.getElementById('github-edit');
+    this.dynamicLinksContainer = document.getElementById('dynamic-links-container');
+    this.dynamicLinksList = document.getElementById('dynamic-links-list');
+    this.noLinksMessage = document.getElementById('no-links-message');
     
     this.followUpSubjectEditInput = document.getElementById('follow-up-subject-edit');
     this.followUpEditInput = document.getElementById('follow-up-edit');
     this.introductionSubjectEditInput = document.getElementById('introduction-subject-edit');
     this.introductionEditInput = document.getElementById('introduction-edit');
     
-    this.linkItems = document.querySelectorAll('.link-item');
     this.templateItems = document.querySelectorAll('.email-template-item');
     
     // Bind methods to preserve context
@@ -76,6 +81,7 @@ Best regards,
     this.saveQuickLinks = this.saveQuickLinks.bind(this);
     this.saveTemplates = this.saveTemplates.bind(this);
     this.showTemplateModal = this.showTemplateModal.bind(this);
+    this.addNewLinkInput = this.addNewLinkInput.bind(this);
     
     // Set up event listeners
     this.editLinksButton.addEventListener('click', this.enterQuickLinksEditMode);
@@ -84,19 +90,7 @@ Best regards,
     this.cancelTemplatesButton.addEventListener('click', this.exitTemplatesEditMode);
     this.saveLinksButton.addEventListener('click', this.saveQuickLinks);
     this.saveTemplatesButton.addEventListener('click', this.saveTemplates);
-    
-    // Set up click handlers for link items
-    this.linkItems.forEach(item => {
-      item.addEventListener('click', (event) => {
-        const key = item.dataset.linkKey;
-        const urlToCopy = this.currentLinks[key];
-        if (urlToCopy) {
-          this.copyToClipboard(urlToCopy, item);
-        } else {
-          alert(`${item.querySelector('.link-title').textContent} link is not set. Click Edit to add it.`);
-        }
-      });
-    });
+    this.addLinkButton.addEventListener('click', this.addNewLinkInput);
     
     // Set up click handlers for email template items
     this.templateItems.forEach(item => {
@@ -121,8 +115,26 @@ Best regards,
   
   async loadQuickLinks() {
     const result = await chrome.storage.local.get(this.STORAGE_KEY);
-    this.currentLinks = result[this.STORAGE_KEY] || { ...this.defaultLinks };
-    this.updateLinkItems();
+    
+    // Check if we have stored links and if it's an array
+    if (result[this.STORAGE_KEY] && Array.isArray(result[this.STORAGE_KEY])) {
+      this.currentLinks = result[this.STORAGE_KEY];
+    } 
+    // Handle migration from old object format to new array format
+    else if (result[this.STORAGE_KEY] && typeof result[this.STORAGE_KEY] === 'object') {
+      const oldLinks = result[this.STORAGE_KEY];
+      this.currentLinks = [
+        { id: 'link-1', type: 'linkedin', url: oldLinks.linkedin || '', title: 'LinkedIn' },
+        { id: 'link-2', type: 'website', url: oldLinks.website || '', title: 'Personal Website' },
+        { id: 'link-3', type: 'github', url: oldLinks.github || '', title: 'GitHub' }
+      ].filter(link => link.url); // Only keep links that have URLs
+    } 
+    // Otherwise use default links
+    else {
+      this.currentLinks = [...this.defaultLinks];
+    }
+    
+    this.renderLinkItems();
   },
   
   async loadEmailTemplates() {
@@ -143,19 +155,61 @@ Best regards,
     this.updateTemplateItems();
   },
   
-  updateLinkItems() {
-    this.linkItems.forEach(item => {
-      const key = item.dataset.linkKey;
-      const urlSpan = item.querySelector('.link-url');
-      if (urlSpan) {
-        urlSpan.textContent = this.currentLinks[key] || '(Not Set)';
-      }
-      // Ensure logo and title are always visible
-      const logo = item.querySelector('.link-logo');
-      const title = item.querySelector('.link-title');
-      if (logo) logo.style.display = '';
-      if (title) title.style.display = '';
+  renderLinkItems() {
+    // Clear existing links
+    this.dynamicLinksContainer.innerHTML = '';
+    
+    // Check if we have any links to display
+    if (this.currentLinks.length === 0) {
+      this.noLinksMessage.style.display = 'block';
+      this.dynamicLinksContainer.appendChild(this.noLinksMessage);
+      return;
+    }
+    
+    // Hide the no-links message if we have links
+    this.noLinksMessage.style.display = 'none';
+    
+    // Render each link
+    this.currentLinks.forEach(link => {
+      const linkItem = this.createLinkItemElement(link);
+      this.dynamicLinksContainer.appendChild(linkItem);
+      
+      // Add click handler to copy link URL
+      linkItem.addEventListener('click', () => {
+        if (link.url) {
+          this.copyToClipboard(link.url, linkItem);
+        } else {
+          alert(`${link.title} link is not set. Click Edit to add it.`);
+        }
+      });
     });
+  },
+  
+  createLinkItemElement(link) {
+    const linkItem = document.createElement('div');
+    linkItem.className = 'link-item';
+    linkItem.dataset.linkId = link.id;
+    
+    // Determine the correct icon to use
+    let iconHtml;
+    if (link.type === 'other') {
+      // Use the link-45deg.svg file instead of inline SVG
+      iconHtml = `<img src="link-45deg.svg" alt="Other Link" class="link-logo">`;
+    } else {
+      // Use an external SVG file
+      const iconFile = this.linkIcons[link.type] || this.linkIcons.other;
+      iconHtml = `<img src="${iconFile}" alt="${link.type} Logo" class="link-logo">`;
+    }
+    
+    linkItem.innerHTML = `
+      ${iconHtml}
+      <div class="link-text">
+        <span class="link-title">${link.title}</span>
+        <span class="link-url">${link.url || '(Not Set)'}</span>
+      </div>
+    `;
+    
+    return linkItem;
   },
   
   updateTemplateItems() {
@@ -180,6 +234,71 @@ Best regards,
         }
       }
     });
+  },
+  
+  addNewLinkInput() {
+    const linkId = `link-${Date.now()}`; // Create a unique ID
+    const linkInputRow = this.createLinkInputRow({ id: linkId, type: 'linkedin', url: '', title: '' });
+    this.dynamicLinksList.appendChild(linkInputRow);
+    
+    // Focus on the title input of the newly added link
+    const titleInput = linkInputRow.querySelector('.link-title-input');
+    if (titleInput) {
+      titleInput.focus();
+    }
+  },
+  
+  createLinkInputRow(link = {}) {
+    const container = document.createElement('div');
+    container.className = 'link-input-container';
+    container.dataset.linkId = link.id;
+    
+    // Create link type dropdown
+    const typeSelect = document.createElement('select');
+    typeSelect.className = 'link-type-select';
+    typeSelect.innerHTML = `
+      <option value="linkedin" ${link.type === 'linkedin' ? 'selected' : ''}>LinkedIn</option>
+      <option value="github" ${link.type === 'github' ? 'selected' : ''}>GitHub</option>
+      <option value="website" ${link.type === 'website' ? 'selected' : ''}>Website</option>
+      <option value="other" ${link.type === 'other' ? 'selected' : ''}>Other</option>
+    `;
+    
+    // Create title input group
+    const titleGroup = document.createElement('div');
+    titleGroup.className = 'form-group';
+    const titleInput = document.createElement('input');
+    titleInput.type = 'text';
+    titleInput.className = 'link-title-input';
+    titleInput.placeholder = 'Link Title';
+    titleInput.value = link.title || '';
+    titleGroup.appendChild(titleInput);
+    
+    // Create URL input group
+    const urlGroup = document.createElement('div');
+    urlGroup.className = 'form-group';
+    const urlInput = document.createElement('input');
+    urlInput.type = 'url';
+    urlInput.className = 'link-url-input';
+    urlInput.placeholder = 'https://...';
+    urlInput.value = link.url || '';
+    urlGroup.appendChild(urlInput);
+    
+    // Create delete button
+    const deleteButton = document.createElement('button');
+    deleteButton.className = 'delete-link-button';
+    deleteButton.innerHTML = '&times;';
+    deleteButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      container.remove();
+    });
+    
+    // Assemble the row
+    container.appendChild(typeSelect);
+    container.appendChild(titleGroup);
+    container.appendChild(urlGroup);
+    container.appendChild(deleteButton);
+    
+    return container;
   },
   
   createTemplateModal() {
@@ -329,6 +448,10 @@ Best regards,
     existingFeedback.forEach(el => el.remove());
     
     navigator.clipboard.writeText(text).then(() => {
+      if (!element) {
+        return; // If no element is provided, just copy silently
+      }
+      
       // Add animation classes
       element.classList.add('being-copied');
       
@@ -386,19 +509,30 @@ Best regards,
       }, 800);
     }).catch(err => {
       console.error('Failed to copy text: ', err);
-      const originalBorder = element.style.borderColor; 
-      element.style.border = '1px solid var(--danger-red)';
-      setTimeout(() => {
-        element.style.border = originalBorder || 'none'; // Revert border
-      }, 1500);
+      if (element) {
+        const originalBorder = element.style.borderColor; 
+        element.style.border = '1px solid var(--danger-red)';
+        setTimeout(() => {
+          element.style.border = originalBorder || 'none'; // Revert border
+        }, 1500);
+      }
     });
   },
   
   enterQuickLinksEditMode() {
-    // Populate inputs with current values
-    this.linkedinEditInput.value = this.currentLinks.linkedin || '';
-    this.websiteEditInput.value = this.currentLinks.website || '';
-    this.githubEditInput.value = this.currentLinks.github || '';
+    // Clear existing link inputs
+    this.dynamicLinksList.innerHTML = '';
+    
+    // Create inputs for existing links
+    this.currentLinks.forEach(link => {
+      const linkInputRow = this.createLinkInputRow(link);
+      this.dynamicLinksList.appendChild(linkInputRow);
+    });
+    
+    // If no links exist, add a blank one
+    if (this.currentLinks.length === 0) {
+      this.addNewLinkInput();
+    }
 
     // Toggle visibility
     document.body.classList.add('editing-quicklinks');
@@ -435,17 +569,57 @@ Best regards,
   },
   
   async saveQuickLinks() {
-    const newLinks = {
-      linkedin: this.linkedinEditInput.value.trim(),
-      website: this.websiteEditInput.value.trim(),
-      github: this.githubEditInput.value.trim()
-    };
+    const newLinks = [];
+    
+    // Get all link input containers
+    const linkContainers = this.dynamicLinksList.querySelectorAll('.link-input-container');
+    
+    // Process each link input
+    linkContainers.forEach(container => {
+      const id = container.dataset.linkId;
+      const typeSelect = container.querySelector('.link-type-select');
+      const titleInput = container.querySelector('.link-title-input');
+      const urlInput = container.querySelector('.link-url-input');
+      
+      // Only add links that have at least a title or URL
+      if (titleInput.value.trim() || urlInput.value.trim()) {
+        const type = typeSelect.value;
+        
+        // Set a default title based on type if no title is provided
+        let title = titleInput.value.trim();
+        if (!title) {
+          switch (type) {
+            case 'linkedin':
+              title = 'LinkedIn';
+              break;
+            case 'github':
+              title = 'GitHub';
+              break;
+            case 'website':
+              title = 'Personal Website';
+              break;
+            case 'other':
+              title = 'Link';
+              break;
+            default:
+              title = 'Link';
+          }
+        }
+        
+        newLinks.push({
+          id,
+          type,
+          title,
+          url: urlInput.value.trim()
+        });
+      }
+    });
 
     try {
       await chrome.storage.local.set({ [this.STORAGE_KEY]: newLinks });
       
       this.currentLinks = newLinks;
-      this.updateLinkItems();
+      this.renderLinkItems();
       this.exitQuickLinksEditMode();
       
       // Show a success message
