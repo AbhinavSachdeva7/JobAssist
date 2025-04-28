@@ -31,7 +31,7 @@
   
   <!-- Tab navigation -->
   <div class="tabs">
-    <button class="tab-button active" data-tab="quick-links">Quick Links</button>
+    <button class="tab-button active" data-tab="quick-links">Resources</button>
     <button class="tab-button" data-tab="contacts">Contacts</button>
   </div>
 
@@ -52,6 +52,7 @@
 
       <!-- Link Display -->
       <div class="links-display edit-mode-inactive">
+        <h3 class="section-title">Quick Links</h3>
         <div id="linkedin-link" class="link-item" data-link-key="linkedin">
           <img src="linkedin.svg" alt="LinkedIn Logo" class="link-logo">
           <div class="link-text">
@@ -73,6 +74,25 @@
             <span class="link-url"></span>
           </div>
         </div>
+        
+        <!-- Email Templates Clipboard Section -->
+        <div class="email-templates-section">
+          <h3 class="section-title">Email Templates</h3>
+          <div class="email-template-item" data-template-key="follow-up">
+            <img src="pencil-fill.svg" alt="Email Template" class="link-logo">
+            <div class="link-text">
+              <span class="link-title">Follow-up Email</span>
+              <span class="template-preview">Thank you for the opportunity to interview...</span>
+            </div>
+          </div>
+          <div class="email-template-item" data-template-key="introduction">
+            <img src="pencil-fill.svg" alt="Email Template" class="link-logo">
+            <div class="link-text">
+              <span class="link-title">Introduction Email</span>
+              <span class="template-preview">I'm reaching out to express my interest...</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Link Edit Inputs -->
@@ -88,6 +108,17 @@
         <div class="form-group">
           <label for="github-edit">GitHub URL</label>
           <input type="url" id="github-edit" placeholder="https://github.com/yourusername">
+        </div>
+        
+        <!-- Email Templates Edit Section -->
+        <h4 class="section-subtitle">Email Templates</h4>
+        <div class="form-group">
+          <label for="follow-up-edit">Follow-up Email Template</label>
+          <textarea id="follow-up-edit" placeholder="Enter your follow-up email template here..." rows="4"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="introduction-edit">Introduction Email Template</label>
+          <textarea id="introduction-edit" placeholder="Enter your introduction email template here..." rows="4"></textarea>
         </div>
       </div>
     </div>

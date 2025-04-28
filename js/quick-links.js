@@ -1,11 +1,40 @@
 // Quick Links Module
 const QuickLinks = {
   STORAGE_KEY: 'jobAppHelperQuickLinks',
+  TEMPLATES_KEY: 'jobAppHelperEmailTemplates',
   currentLinks: {},
+  currentTemplates: {},
   defaultLinks: {
     linkedin: 'https://www.linkedin.com/in/mab-malik/',
     website: 'https://abdullahmalik.me/',
     github: 'https://github.com/Abdullah-Malik'
+  },
+  defaultTemplates: {
+    'follow-up': `Dear [Hiring Manager's Name],
+
+Thank you for the opportunity to interview for the [Position] role at [Company Name]. I enjoyed our conversation and learning more about the team and position.
+
+I'm writing to follow up on our discussion about [specific topic discussed]. As I mentioned during the interview, my experience with [relevant skill/project] has prepared me well for this role.
+
+Please let me know if you need any additional information from me. I'm excited about the possibility of joining [Company Name] and contributing to [specific goal or project].
+
+Best regards,
+[Your Name]`,
+    'introduction': `Dear [Hiring Manager's Name],
+
+I'm reaching out to express my interest in the [Position] role at [Company Name]. With [number] years of experience in [relevant field] and a background in [relevant background], I believe I would be a great fit for this position.
+
+My key accomplishments include:
+• [Accomplishment 1]
+• [Accomplishment 2]
+• [Accomplishment 3]
+
+I'm particularly drawn to [Company Name] because of [specific reason, e.g., company values, projects, etc.]. I've attached my resume for your review and would welcome the opportunity to discuss how my skills align with your needs.
+
+Thank you for your consideration.
+
+Best regards,
+[Your Name]`
   },
   
   init() {
@@ -18,12 +47,16 @@ const QuickLinks = {
     this.linkedinEditInput = document.getElementById('linkedin-edit');
     this.websiteEditInput = document.getElementById('website-edit');
     this.githubEditInput = document.getElementById('github-edit');
+    this.followUpEditInput = document.getElementById('follow-up-edit');
+    this.introductionEditInput = document.getElementById('introduction-edit');
     this.linkItems = document.querySelectorAll('.link-item');
+    this.templateItems = document.querySelectorAll('.email-template-item');
     
     // Bind methods to preserve context
     this.enterEditMode = this.enterEditMode.bind(this);
     this.exitEditMode = this.exitEditMode.bind(this);
     this.saveLinks = this.saveLinks.bind(this);
+    this.showTemplateModal = this.showTemplateModal.bind(this);
     
     // Set up event listeners
     this.editLinksButton.addEventListener('click', this.enterEditMode);
@@ -43,14 +76,37 @@ const QuickLinks = {
       });
     });
     
-    // Load stored links
+    // Set up click handlers for email template items
+    this.templateItems.forEach(item => {
+      item.addEventListener('click', (event) => {
+        const key = item.dataset.templateKey;
+        const templateText = this.currentTemplates[key];
+        if (templateText) {
+          this.showTemplateModal(key, templateText, item);
+        } else {
+          alert(`${item.querySelector('.link-title').textContent} is not set. Click Edit to add it.`);
+        }
+      });
+    });
+    
+    // Load stored links and templates
     this.loadQuickLinks();
+    this.loadEmailTemplates();
+    
+    // Create modal elements for templates
+    this.createTemplateModal();
   },
   
   async loadQuickLinks() {
     const result = await chrome.storage.local.get(this.STORAGE_KEY);
     this.currentLinks = result[this.STORAGE_KEY] || { ...this.defaultLinks };
     this.updateLinkItems();
+  },
+  
+  async loadEmailTemplates() {
+    const result = await chrome.storage.local.get(this.TEMPLATES_KEY);
+    this.currentTemplates = result[this.TEMPLATES_KEY] || { ...this.defaultTemplates };
+    this.updateTemplateItems();
   },
   
   updateLinkItems() {
@@ -66,6 +122,112 @@ const QuickLinks = {
       if (logo) logo.style.display = '';
       if (title) title.style.display = '';
     });
+  },
+  
+  updateTemplateItems() {
+    this.templateItems.forEach(item => {
+      const key = item.dataset.templateKey;
+      const previewSpan = item.querySelector('.template-preview');
+      if (previewSpan && this.currentTemplates[key]) {
+        // Create a preview of the template (first 30 characters)
+        const templateText = this.currentTemplates[key];
+        const previewText = templateText.substring(0, 30) + (templateText.length > 30 ? '...' : '');
+        previewSpan.textContent = previewText;
+      }
+    });
+  },
+  
+  createTemplateModal() {
+    // Create modal overlay
+    const modalOverlay = document.createElement('div');
+    modalOverlay.className = 'template-modal-overlay';
+    
+    // Create modal container
+    const modal = document.createElement('div');
+    modal.className = 'template-modal';
+    
+    // Create modal header
+    const modalHeader = document.createElement('div');
+    modalHeader.className = 'template-modal-header';
+    
+    const modalTitle = document.createElement('h3');
+    modalTitle.className = 'template-modal-title';
+    
+    const closeButton = document.createElement('button');
+    closeButton.className = 'template-modal-close';
+    closeButton.innerHTML = '&times;';
+    closeButton.addEventListener('click', () => this.closeTemplateModal());
+    
+    modalHeader.appendChild(modalTitle);
+    modalHeader.appendChild(closeButton);
+    
+    // Create modal body
+    const modalBody = document.createElement('div');
+    modalBody.className = 'template-modal-body';
+    
+    const templateContent = document.createElement('div');
+    templateContent.className = 'template-content';
+    
+    modalBody.appendChild(templateContent);
+    
+    // Create modal footer
+    const modalFooter = document.createElement('div');
+    modalFooter.className = 'template-modal-footer';
+    
+    const copyButton = document.createElement('button');
+    copyButton.className = 'copy-template-button';
+    copyButton.textContent = 'Copy to Clipboard';
+    
+    modalFooter.appendChild(copyButton);
+    
+    // Assemble the modal
+    modal.appendChild(modalHeader);
+    modal.appendChild(modalBody);
+    modal.appendChild(modalFooter);
+    modalOverlay.appendChild(modal);
+    
+    // Add to document
+    document.body.appendChild(modalOverlay);
+    
+    // Store references
+    this.templateModal = {
+      overlay: modalOverlay,
+      container: modal,
+      title: modalTitle,
+      content: templateContent,
+      copyButton: copyButton
+    };
+  },
+  
+  showTemplateModal(key, text, item) {
+    // Set the title and content
+    const title = item.querySelector('.link-title').textContent;
+    this.templateModal.title.textContent = title;
+    this.templateModal.content.textContent = text;
+    
+    // Set up the copy button
+    const copyButton = this.templateModal.copyButton;
+    const self = this;
+    copyButton.onclick = function() {
+      self.copyToClipboard(text, item);
+      self.closeTemplateModal();
+    };
+    
+    // Show the modal
+    this.templateModal.overlay.classList.add('show');
+    
+    // Add event listener to close on outside click
+    const handleOutsideClick = (event) => {
+      if (event.target === this.templateModal.overlay) {
+        this.closeTemplateModal();
+        this.templateModal.overlay.removeEventListener('click', handleOutsideClick);
+      }
+    };
+    this.templateModal.overlay.addEventListener('click', handleOutsideClick);
+  },
+  
+  closeTemplateModal() {
+    this.templateModal.overlay.classList.remove('show');
   },
   
   copyToClipboard(text, element) {
@@ -144,6 +306,10 @@ const QuickLinks = {
     this.linkedinEditInput.value = this.currentLinks.linkedin || '';
     this.websiteEditInput.value = this.currentLinks.website || '';
     this.githubEditInput.value = this.currentLinks.github || '';
+    
+    // Populate email template inputs
+    this.followUpEditInput.value = this.currentTemplates['follow-up'] || '';
+    this.introductionEditInput.value = this.currentTemplates['introduction'] || '';
 
     // Toggle visibility using body class
     document.body.classList.add('editing-links');
@@ -159,19 +325,31 @@ const QuickLinks = {
       website: this.websiteEditInput.value.trim(),
       github: this.githubEditInput.value.trim()
     };
+    
+    const newTemplates = {
+      'follow-up': this.followUpEditInput.value.trim(),
+      'introduction': this.introductionEditInput.value.trim()
+    };
 
     try {
-      await chrome.storage.local.set({ [this.STORAGE_KEY]: newLinks });
+      await chrome.storage.local.set({ 
+        [this.STORAGE_KEY]: newLinks,
+        [this.TEMPLATES_KEY]: newTemplates
+      });
+      
       this.currentLinks = newLinks;
+      this.currentTemplates = newTemplates;
+      
       this.updateLinkItems();
+      this.updateTemplateItems();
       this.exitEditMode();
       
       // Show a success message
-      this.showToast('Links saved successfully!');
+      this.showToast('Links and templates saved successfully!');
       
     } catch (error) {
-      console.error("Error saving links:", error);
-      alert("Failed to save links. See console for details.");
+      console.error("Error saving data:", error);
+      alert("Failed to save data. See console for details.");
     }
   },
   
