@@ -196,129 +196,171 @@ const ContactManager = {
         // Pre-fill the URL field if it's a LinkedIn profile
         if (tab.url.startsWith('https://www.linkedin.com/in/')) {
           this.contactUrlInput.value = tab.url;
+
+          // --- Try to extract Name and Employer ---
           try {
-            console.log("Attempting to find company name span and process text...");
-            // Execute script in the LinkedIn tab
+            console.log("Attempting to extract Name and Employer from LinkedIn page...");
+            
+            // Execute script in the LinkedIn tab to get details
             const results = await chrome.scripting.executeScript({
               target: { tabId: tab.id },
               func: () => {
                 
-                // --- Steps 1-4: Find the listContainerDiv (Kept as context is needed) ---
-                let experienceHeader = null;
-                const potentialHeaderSelectors = ['h2', 'h3', 'span', 'div']; 
-                for (const selector of potentialHeaderSelectors) { /* ... find header ... */ 
-                  const elements = document.querySelectorAll(selector);
-                  for (const element of elements) {
-                    if (element.innerText && element.innerText.trim().split('\n')[0] === 'Experience') { 
-                      experienceHeader = element;
-                      break; 
-                    }
-                  }
-                  if (experienceHeader) break; 
-                }
-                if (!experienceHeader) { console.log("DEBUG: Could not find 'Experience' header."); return ''; } // Return empty string
-                
-                const experienceSection = experienceHeader.closest(/* ... section selectors ... */
-                  'section.artdeco-card, section[data-section="experience"], div[data-view-name="profile-card-layout"], #experience-section, #experience, section'
-                );
-                if (!experienceSection) { console.log("DEBUG: Could not find parent section."); return ''; }
-                
-                const headerContainerDiv = experienceHeader.closest('section > div'); 
-                if (!headerContainerDiv) { console.log("DEBUG: Could not find header container div."); return ''; }
-                
-                let listContainerDiv = headerContainerDiv.nextElementSibling;
-                while (listContainerDiv && listContainerDiv.tagName !== 'DIV') {
-                  listContainerDiv = listContainerDiv.nextElementSibling;
-                }
-                if (!listContainerDiv) { console.log("DEBUG: Could not find the list container div."); return ''; }
-                console.log("DEBUG: Found list container div:", listContainerDiv);
-          
-                // --- Step 5: Find the *first* SPAN using the BROAD XPath ---
-                let companyInfoSpan = null;
-                try {
-                    const middleDot = '\u00B7'; // Unicode escape
-                    // Using the BROAD XPath relative to listContainerDiv
-                    const xpathExpression = `.//span[contains(., '${middleDot}')]`; 
-                    console.log("DEBUG: Executing BROAD XPath:", xpathExpression);
-          
-                    const xpathResult = document.evaluate(
-                        xpathExpression,
-                        listContainerDiv,           // Context Node
-                        null,                       // Namespace Resolver
-                        XPathResult.FIRST_ORDERED_NODE_TYPE, 
-                        null                        
-                    );
-                    companyInfoSpan = xpathResult.singleNodeValue; 
-                } catch (e) {
-                    console.error("DEBUG: Error executing XPath:", e);
-                    return ''; // Return empty string on error
-                }
-                
-                // --- Step 6: Process the found span using indexOf and substring ---
-                if (companyInfoSpan) { 
-                    console.log("DEBUG: Found target span element (broad XPath):", companyInfoSpan);
-                    // Ensure innerText exists before trimming
-                    const rawText = companyInfoSpan.innerText ? companyInfoSpan.innerText.trim() : '';
-                    console.log("DEBUG: Raw innerText:", rawText);
+                let companyName = ''; // Initialize company name
+                let personName = ''; // Initialize person name
 
-                    const middleDot = '\u00B7';
-                    // Find the index of the FIRST middle dot (use literal or escape)
-                    const firstDotIndex = rawText.indexOf(`${middleDot}`); // Using the literal
-                    // Or safer: const firstDotIndex = rawText.indexOf('\u00B7');
-          
-                    let companyName = ''; // Default to empty
-          
-                    if (firstDotIndex !== -1) {
-                        // If a dot is found, take the substring from the start up to the dot
-                        companyName = rawText.substring(0, firstDotIndex).trim();
-                        console.log("DEBUG: Extracted company name (using indexOf/substring):", companyName);
+                // --- Extract Person's Name ---
+                try {
+                    // Primary selector for name (usually H1)
+                    const nameElement = document.querySelector('h1.text-heading-xlarge, h1'); // Prioritize specific class if known, fallback to generic h1
+                    // Add more fallbacks if needed:
+                    // const nameElement = document.querySelector('h1.text-heading-xlarge') || document.querySelector('h1') || document.querySelector('.pv-text-details__left-panel h1') || document.querySelector('.top-card-layout__title');
+                    
+                    if (nameElement && nameElement.innerText) {
+                        personName = nameElement.innerText.trim();
+                        console.log("DEBUG: Found person name:", personName);
                     } else {
-                        // If no middle dot is found in the text, we might have the wrong span entirely.
-                        // Decide whether to return the raw text or nothing. Returning nothing is safer.
-                        console.log(`DEBUG: Middle dot ('·') not found in raw text: "${rawText}". Cannot extract company name reliably.`);
-                        companyName = ''; // Keep it empty
+                        console.log("DEBUG: Could not find person name element (h1).");
                     }
-          
-                    return companyName; // Return the extracted name or empty string
-          
-                } else {
-                    console.log("DEBUG: Could not find any span containing '\\u00B7' using broad XPath.");
-                    return ''; // Return empty string if not found
+                } catch(nameError) {
+                    console.error("DEBUG: Error finding person name:", nameError);
                 }
+
+
+                // --- Extract Employer Name (using previous logic) ---
+                try {
+                    // Steps 1-4: Find the listContainerDiv (Context for employer search)
+                    let experienceHeader = null;
+                    const potentialHeaderSelectors = ['h2', 'h3', 'span', 'div']; 
+                    for (const selector of potentialHeaderSelectors) { 
+                      const elements = document.querySelectorAll(selector);
+                      for (const element of elements) {
+                        if (element.innerText && element.innerText.trim().split('\n')[0] === 'Experience') { 
+                          experienceHeader = element;
+                          break; 
+                        }
+                      }
+                      if (experienceHeader) break; 
+                    }
+                    
+                    if (experienceHeader) {
+                        const experienceSection = experienceHeader.closest('section.artdeco-card, section[data-section="experience"], div[data-view-name="profile-card-layout"], #experience-section, #experience, section');
+                        if (experienceSection) {
+                            const headerContainerDiv = experienceHeader.closest('section > div'); 
+                            if (headerContainerDiv) {
+                                let listContainerDiv = headerContainerDiv.nextElementSibling;
+                                while (listContainerDiv && listContainerDiv.tagName !== 'DIV') {
+                                  listContainerDiv = listContainerDiv.nextElementSibling;
+                                }
+                                
+                                if (listContainerDiv) {
+                                    // Step 5: Find the *first* SPAN using the BROAD XPath
+                                    let companyInfoSpan = null;
+                                    try {
+                                        const middleDot = '\u00B7'; // Unicode escape
+                                        const xpathExpression = `.//span[contains(., '${middleDot}')]`; 
+                                        // console.log("DEBUG: Executing BROAD XPath for company:", xpathExpression); // Optional logging
+                                        const xpathResult = document.evaluate(xpathExpression, listContainerDiv, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
+                                        companyInfoSpan = xpathResult.singleNodeValue; 
+                                    } catch (e) {
+                                        console.error("DEBUG: Error executing XPath for company:", e);
+                                    }
+
+                                    // Step 6: Process the found span
+                                    if (companyInfoSpan) { 
+                                        const rawText = companyInfoSpan.innerText ? companyInfoSpan.innerText.trim() : '';
+                                        // console.log("DEBUG: Raw innerText for company:", rawText); // Optional logging
+                                        const firstDotIndex = rawText.indexOf('\u00B7'); 
+                                        if (firstDotIndex !== -1) {
+                                            companyName = rawText.substring(0, firstDotIndex).trim();
+                                            // console.log("DEBUG: Extracted company name:", companyName); // Optional logging
+                                        } else {
+                                             console.log(`DEBUG: Middle dot not found in company raw text: "${rawText}"`);
+                                        }
+                                    } else {
+                                         console.log("DEBUG: Could not find company span using XPath.");
+                                    }
+                                } else { console.log("DEBUG: Could not find the list container div for company."); }
+                            } else { console.log("DEBUG: Could not find header container div for company."); }
+                        } else { console.log("DEBUG: Could not find parent section for company."); }
+                    } else { console.log("DEBUG: Could not find 'Experience' header for company."); }
+                } catch(companyError) {
+                     console.error("DEBUG: Error finding company name:", companyError);
+                }
+
+                // --- Return both pieces of information ---
+                return { 
+                  personName: personName, 
+                  companyName: companyName 
+                };
+
               } // end of func
             }); // end of executeScript
           
-            // --- Update Input Field ---
-            // Check if the script returned a non-null result (empty string is valid)
-            if (results && results[0] && results[0].result !== null) {
-              const extractedCompanyName = results[0].result;
-              // Log the result, even if it's an empty string
-              console.log("Script executed, extracted company name:", extractedCompanyName); 
-              // Assign the potentially empty string to the input field
-              this.contactEmployerInput.value = extractedCompanyName; 
+            // --- Update Input Fields ---
+            if (results && results[0] && results[0].result) {
+              const extractedData = results[0].result;
+              console.log("Script extracted data:", extractedData); 
+              
+              // Assign Person Name (assuming 'this.contactNameInput' is correct)
+              if (extractedData.personName) {
+                  this.contactNameInput.value = extractedData.personName;
+                  console.log("Populated Name field.");
+              } else {
+                   console.log("Could not populate Name field (name not found).");
+                   this.contactNameInput.value = ''; // Clear if not found
+              }
+
+              // Assign Company Name
+              if (extractedData.companyName) {
+                  this.contactEmployerInput.value = extractedData.companyName; 
+                  console.log("Populated Employer field.");
+              } else {
+                  console.log("Could not populate Employer field (company name not found/extracted).");
+                  this.contactEmployerInput.value = ''; // Clear if not found
+              }
+
             } else {
-              console.log("Script execution failed or did not return a result (returned null).");
-              this.contactEmployerInput.value = ''; // Clear the field
+              console.log("Script execution failed or did not return a result object.");
+              this.contactNameInput.value = '';    // Clear fields on failure
+              this.contactEmployerInput.value = ''; 
             }
           
-          } catch (err) {
-            // Log errors related to injecting the script itself
-            console.error("Error injecting script or processing results:", err);
-            this.contactEmployerInput.value = ''; // Clear the field on error
+          } catch (scriptError) {
+            // Log errors related to injecting the script or processing results
+            console.error("Error executing script or processing results:", scriptError);
+            this.contactNameInput.value = '';    // Clear fields on error
+            this.contactEmployerInput.value = ''; 
           }
-        } else {
-          this.contactUrlInput.value = '';
+        // End: if (tab.url.startsWith('https://www.linkedin.com/in/'))
+        } else { 
+          // Not a LinkedIn profile URL, clear fields
+          console.log("Not a LinkedIn profile URL.");
+          this.contactUrlInput.value = tab.url || ''; // Show current URL or empty
+          this.contactNameInput.value = '';
+          this.contactEmployerInput.value = '';
         }
+      // End: if (tab && tab.url)
+      } else {
+         console.log("Could not get active tab or URL.");
+         // Clear fields if tab info is unavailable
+         this.contactUrlInput.value = '';
+         this.contactNameInput.value = '';
+         this.contactEmployerInput.value = '';
       }
     } catch (error) {
-      console.error("Error getting current tab:", error);
+      console.error("Error in showAddContactForm:", error);
+      // Clear fields on outer error
       this.contactUrlInput.value = '';
+      this.contactNameInput.value = '';
+      this.contactEmployerInput.value = '';
     }
 
+    // Show the form and hide the button (existing logic)
     this.addContactFormDiv.style.display = 'block';
     this.showAddContactFormButton.style.display = 'none';
     
-    // Set focus to the name field
+    // Set focus to the name field (existing logic)
     this.contactNameInput.focus();
   },
   
