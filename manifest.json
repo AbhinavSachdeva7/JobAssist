@@ -10,7 +10,8 @@
     "scripting"
   ],
   "host_permissions": [
-    "https://*.linkedin.com/*"
+    "https://*.linkedin.com/*",
+    "https://mail.google.com/*"
   ],
   "side_panel": { 
     "default_path": "popup.html"

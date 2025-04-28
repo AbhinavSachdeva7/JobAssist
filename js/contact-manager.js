@@ -83,7 +83,7 @@ const ContactManager = {
     
     contactDiv.innerHTML = `
       <strong class="contact-name">${name}</strong>
-      <span class="contact-email">${email}</span>
+      <span class="contact-email clickable-email" data-email="${email}" style="cursor: pointer; text-decoration: none;">${email}</span>
       ${employer ? `<span class="contact-employer">Employer: ${employer}</span>` : ''}
       ${url ? `<span class="copyable-url" data-url="${url}" style="cursor: pointer; color: var(--primary); font-size: 12px; display: block; margin-top: 4px; margin-bottom: 4px; width: 100%; overflow: hidden; text-overflow: ellipsis; text-decoration: none; transition: all 0.2s ease;">${url}</span>` : ''}
       <div style="display: flex; gap: 10px; margin-top: 10px; border: none; background: transparent; box-shadow: none; padding: 0;">
@@ -92,10 +92,28 @@ const ContactManager = {
       </div>
     `;
 
-    // Set up email button listener
+    // Set up email button listener with mailto (original functionality)
     contactDiv.querySelector('.email-button').addEventListener('click', (e) => {
       const mailtoEmail = e.target.getAttribute('data-email');
       window.open(`mailto:${mailtoEmail}`);
+    });
+
+    // Set up clickable email listener with Gmail compose functionality
+    contactDiv.querySelector('.clickable-email').addEventListener('click', (e) => {
+      const email = e.target.getAttribute('data-email');
+      this.openEmailCompose(email);
+    });
+
+    // Add hover effect to email text
+    const emailElement = contactDiv.querySelector('.clickable-email');
+    emailElement.addEventListener('mouseenter', (e) => {
+      e.target.style.color = "var(--primary)";
+      e.target.style.textDecoration = "underline";
+    });
+    
+    emailElement.addEventListener('mouseleave', (e) => {
+      e.target.style.color = "";
+      e.target.style.textDecoration = "none";
     });
 
     // Set up delete button listener
@@ -157,6 +175,32 @@ const ContactManager = {
     }
 
     this.contactsListDiv.appendChild(contactDiv);
+  },
+
+  // Keep the Gmail compose functionality for email text clicks
+  async openEmailCompose(email) {
+    try {
+      // First check if Gmail is open in any tab
+      const gmailTabs = await chrome.tabs.query({ url: 'https://mail.google.com/*' });
+      
+      if (gmailTabs.length > 0) {
+        // Use the first Gmail tab found
+        await chrome.tabs.update(gmailTabs[0].id, { active: true });
+        
+        // Send message to background script to open Gmail compose
+        chrome.runtime.sendMessage({
+          action: 'openGmailCompose',
+          email: email
+        });
+      } else {
+        // Fallback to mailto if Gmail is not open
+        window.open(`mailto:${email}`);
+      }
+    } catch (error) {
+      console.error('Error opening email compose:', error);
+      // Fallback to mailto on error
+      window.open(`mailto:${email}`);
+    }
   },
   
   async saveContact(name, email, employer, url) {
