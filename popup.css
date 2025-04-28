@@ -606,13 +606,46 @@ hr {
   color: white;
 }
 
-/* Hide elements based on mode */
+/* Edit mode classes for separate sections */
 body.editing-links .edit-mode-inactive {
   display: none;
 }
 
 body:not(.editing-links) .edit-mode-active {
   display: none;
+}
+
+/* New edit mode classes for separate sections */
+body.editing-quicklinks .quick-links-edit {
+  display: block;
+}
+
+body.editing-templates .templates-edit {
+  display: block;
+}
+
+body.editing-quicklinks .links-display,
+body.editing-templates .links-display {
+  display: none;
+}
+
+/* Base state for edit forms */
+.quick-links-edit,
+.templates-edit {
+  display: none;
+}
+
+/* Save button styling consistency */
+#save-links-button,
+#save-templates-button {
+  background-color: var(--primary);
+  color: white;
+}
+
+/* Cancel button styling consistency */
+#cancel-links-button,
+#cancel-templates-button {
+  color: var(--text-light);
 }
 
 /* Animation for no contacts message */
@@ -1018,5 +1051,30 @@ textarea:focus {
   align-items: center;
   justify-content: center;
   padding: 12px 15px;
+}
+
+/* Section Header with Edit Button */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+.section-header .section-title {
+  margin-bottom: 0;
+  flex: 1;
+}
+
+.section-header .icon-button {
+  margin-left: 10px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.section-header .icon-button:hover {
+  background-color: rgba(106, 13, 173, 0.1);
+  transform: translateY(-1px);
 }
 

@@ -40,10 +40,16 @@ Best regards,
   init() {
     // Cache DOM elements
     this.editLinksButton = document.getElementById('edit-links-button');
+    this.editTemplatesButton = document.getElementById('edit-templates-button');
     this.saveLinksButton = document.getElementById('save-links-button');
-    this.cancelEditLinksButton = document.getElementById('cancel-edit-links-button');
+    this.cancelLinksButton = document.getElementById('cancel-links-button');
+    this.saveTemplatesButton = document.getElementById('save-templates-button');
+    this.cancelTemplatesButton = document.getElementById('cancel-templates-button');
+    
     this.linksDisplayDiv = document.querySelector('.links-display');
-    this.linksEditDiv = document.querySelector('.links-edit');
+    this.quickLinksEditDiv = document.querySelector('.quick-links-edit');
+    this.templatesEditDiv = document.querySelector('.templates-edit');
+    
     this.linkedinEditInput = document.getElementById('linkedin-edit');
     this.websiteEditInput = document.getElementById('website-edit');
     this.githubEditInput = document.getElementById('github-edit');
@@ -53,15 +59,21 @@ Best regards,
     this.templateItems = document.querySelectorAll('.email-template-item');
     
     // Bind methods to preserve context
-    this.enterEditMode = this.enterEditMode.bind(this);
-    this.exitEditMode = this.exitEditMode.bind(this);
-    this.saveLinks = this.saveLinks.bind(this);
+    this.enterQuickLinksEditMode = this.enterQuickLinksEditMode.bind(this);
+    this.enterTemplatesEditMode = this.enterTemplatesEditMode.bind(this);
+    this.exitQuickLinksEditMode = this.exitQuickLinksEditMode.bind(this);
+    this.exitTemplatesEditMode = this.exitTemplatesEditMode.bind(this);
+    this.saveQuickLinks = this.saveQuickLinks.bind(this);
+    this.saveTemplates = this.saveTemplates.bind(this);
     this.showTemplateModal = this.showTemplateModal.bind(this);
     
     // Set up event listeners
-    this.editLinksButton.addEventListener('click', this.enterEditMode);
-    this.cancelEditLinksButton.addEventListener('click', this.exitEditMode);
-    this.saveLinksButton.addEventListener('click', this.saveLinks);
+    this.editLinksButton.addEventListener('click', this.enterQuickLinksEditMode);
+    this.editTemplatesButton.addEventListener('click', this.enterTemplatesEditMode);
+    this.cancelLinksButton.addEventListener('click', this.exitQuickLinksEditMode);
+    this.cancelTemplatesButton.addEventListener('click', this.exitTemplatesEditMode);
+    this.saveLinksButton.addEventListener('click', this.saveQuickLinks);
+    this.saveTemplatesButton.addEventListener('click', this.saveTemplates);
     
     // Set up click handlers for link items
     this.linkItems.forEach(item => {
@@ -301,55 +313,83 @@ Best regards,
     });
   },
   
-  enterEditMode() {
+  enterQuickLinksEditMode() {
     // Populate inputs with current values
     this.linkedinEditInput.value = this.currentLinks.linkedin || '';
     this.websiteEditInput.value = this.currentLinks.website || '';
     this.githubEditInput.value = this.currentLinks.github || '';
-    
+
+    // Toggle visibility
+    document.body.classList.add('editing-quicklinks');
+    this.linksDisplayDiv.style.display = 'none';
+    this.quickLinksEditDiv.style.display = 'block';
+  },
+  
+  enterTemplatesEditMode() {
     // Populate email template inputs
     this.followUpEditInput.value = this.currentTemplates['follow-up'] || '';
     this.introductionEditInput.value = this.currentTemplates['introduction'] || '';
 
-    // Toggle visibility using body class
-    document.body.classList.add('editing-links');
+    // Toggle visibility
+    document.body.classList.add('editing-templates');
+    this.linksDisplayDiv.style.display = 'none';
+    this.templatesEditDiv.style.display = 'block';
   },
   
-  exitEditMode() {
-    document.body.classList.remove('editing-links');
+  exitQuickLinksEditMode() {
+    document.body.classList.remove('editing-quicklinks');
+    this.quickLinksEditDiv.style.display = 'none';
+    this.linksDisplayDiv.style.display = 'block';
   },
   
-  async saveLinks() {
+  exitTemplatesEditMode() {
+    document.body.classList.remove('editing-templates');
+    this.templatesEditDiv.style.display = 'none';
+    this.linksDisplayDiv.style.display = 'block';
+  },
+  
+  async saveQuickLinks() {
     const newLinks = {
       linkedin: this.linkedinEditInput.value.trim(),
       website: this.websiteEditInput.value.trim(),
       github: this.githubEditInput.value.trim()
     };
-    
+
+    try {
+      await chrome.storage.local.set({ [this.STORAGE_KEY]: newLinks });
+      
+      this.currentLinks = newLinks;
+      this.updateLinkItems();
+      this.exitQuickLinksEditMode();
+      
+      // Show a success message
+      this.showToast('Quick links saved successfully!');
+      
+    } catch (error) {
+      console.error("Error saving links:", error);
+      alert("Failed to save links. See console for details.");
+    }
+  },
+  
+  async saveTemplates() {
     const newTemplates = {
       'follow-up': this.followUpEditInput.value.trim(),
       'introduction': this.introductionEditInput.value.trim()
     };
 
     try {
-      await chrome.storage.local.set({ 
-        [this.STORAGE_KEY]: newLinks,
-        [this.TEMPLATES_KEY]: newTemplates
-      });
+      await chrome.storage.local.set({ [this.TEMPLATES_KEY]: newTemplates });
       
-      this.currentLinks = newLinks;
       this.currentTemplates = newTemplates;
-      
-      this.updateLinkItems();
       this.updateTemplateItems();
-      this.exitEditMode();
+      this.exitTemplatesEditMode();
       
       // Show a success message
-      this.showToast('Links and templates saved successfully!');
+      this.showToast('Email templates saved successfully!');
       
     } catch (error) {
-      console.error("Error saving data:", error);
-      alert("Failed to save data. See console for details.");
+      console.error("Error saving templates:", error);
+      alert("Failed to save templates. See console for details.");
     }
   },
   
