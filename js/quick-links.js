@@ -284,6 +284,11 @@ Best regards,
   },
   
   showTemplateModal(key, template, item) {
+    if (!this.templateModal) {
+      console.error("Template modal not initialized");
+      return;
+    }
+    
     // Set the title and content
     const title = item.querySelector('.link-title').textContent;
     this.templateModal.title.textContent = title;
@@ -294,22 +299,26 @@ Best regards,
     const self = this;
     
     this.templateModal.copySubjectButton.onclick = function() {
-      self.copyToClipboard(template.subject, item);
+      self.copyToClipboard(template.subject, null);
+      self.closeTemplateModal();
       self.showToast('Subject copied to clipboard!');
     };
     
     this.templateModal.copyBodyButton.onclick = function() {
-      self.copyToClipboard(template.body, item);
+      self.copyToClipboard(template.body, null);
+      self.closeTemplateModal();
       self.showToast('Body copied to clipboard!');
     };
     
     this.templateModal.copyAllButton.onclick = function() {
       const allText = `Subject: ${template.subject}\n\n${template.body}`;
-      self.copyToClipboard(allText, item);
+      self.copyToClipboard(allText, null);
       self.closeTemplateModal();
+      self.showToast('Email template copied to clipboard!');
     };
     
-    // Show the modal
+    // Show the modal with animation
+    document.body.style.overflow = 'hidden'; // Prevent scrolling
     this.templateModal.overlay.classList.add('show');
     
     // Add event listener to close on outside click
@@ -324,6 +333,7 @@ Best regards,
   
   closeTemplateModal() {
     this.templateModal.overlay.classList.remove('show');
+    document.body.style.overflow = ''; // Re-enable scrolling
   },
   
   copyToClipboard(text, element) {

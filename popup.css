@@ -898,23 +898,24 @@ body.editing-templates .links-display {
   transform: translateY(-1px);
 }
 
-.template-subject {
+.template-subject,
+.template-preview {
   font-size: 12px;
-  font-weight: 500;
-  color: var(--primary);
-  display: block;
-  margin-bottom: 3px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  max-width: 220px;
+  display: block;
+}
+
+.template-subject {
+  font-weight: 500;
+  color: var(--primary);
+  margin-bottom: 3px;
 }
 
 .template-preview {
-  font-size: 12px;
   color: var(--text-light);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
   transition: color 0.2s ease;
 }
 
@@ -932,6 +933,112 @@ body.editing-templates .links-display {
   background-color: #f2e6ff;
 }
 
+/* Email Template Edit Form Styling */
+.templates-edit {
+  background-color: white;
+  border-radius: 12px;
+  padding: 18px;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 16px rgba(106, 13, 173, 0.12);
+  border: 1px solid rgba(106, 13, 173, 0.1);
+}
+
+.templates-edit .form-group {
+  margin-bottom: 18px;
+}
+
+.templates-edit label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.templates-edit input[type="text"] {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 14px;
+  height: 42px;
+  transition: all 0.2s ease;
+}
+
+.templates-edit textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text);
+  background-color: var(--background);
+  min-height: 150px;
+  resize: vertical;
+  transition: all 0.2s ease;
+}
+
+.templates-edit input[type="text"]:focus,
+.templates-edit textarea:focus {
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(106, 13, 173, 0.08);
+}
+
+.templates-edit .edit-controls {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid var(--border);
+}
+
+.templates-edit .edit-controls button {
+  padding: 8px 16px;
+  font-weight: 500;
+  border-radius: 6px;
+}
+
+#save-templates-button {
+  background-color: var(--primary);
+  color: white;
+  transition: all 0.2s ease;
+}
+
+#save-templates-button:hover {
+  background-color: var(--primary-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 5px rgba(106, 13, 173, 0.2);
+}
+
+#cancel-templates-button {
+  background-color: transparent;
+  color: var(--text-light);
+  margin-right: 8px;
+  border: 1px solid var(--border);
+  transition: all 0.2s ease;
+}
+
+#cancel-templates-button:hover {
+  background-color: #f5f5f5;
+}
+
+/* Style section divider for email templates */
+.templates-edit .form-section-divider {
+  border-top: 1px solid var(--border);
+  margin: 30px 0 20px;
+  position: relative;
+}
+
+.templates-edit .form-section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--primary);
+  margin: 25px 0 15px;
+}
+
 /* Template Modal Styling */
 .template-modal-overlay {
   position: fixed;
@@ -943,7 +1050,7 @@ body.editing-templates .links-display {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: 2000;
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.3s ease, visibility 0.3s ease;
@@ -958,24 +1065,31 @@ body.editing-templates .links-display {
   background-color: white;
   width: 90%;
   max-width: 500px;
-  border-radius: 8px;
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
   display: flex;
   flex-direction: column;
   max-height: 90vh;
+  transform: translateY(20px);
+  transition: transform 0.3s ease;
+}
+
+.template-modal-overlay.show .template-modal {
+  transform: translateY(0);
 }
 
 .template-modal-header {
-  padding: 12px 15px;
+  padding: 16px;
   border-bottom: 1px solid var(--border);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background-color: var(--background-light);
 }
 
 .template-modal-title {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
   color: var(--text);
   margin: 0;
@@ -984,15 +1098,19 @@ body.editing-templates .links-display {
 .template-modal-close {
   background: none;
   border: none;
-  font-size: 22px;
+  font-size: 24px;
   line-height: 1;
   padding: 0 6px;
   cursor: pointer;
   color: var(--text-light);
 }
 
+.template-modal-close:hover {
+  color: var(--danger-red);
+}
+
 .template-modal-body {
-  padding: 15px;
+  padding: 20px;
   overflow-y: auto;
   flex-grow: 1;
 }
@@ -1002,30 +1120,31 @@ body.editing-templates .links-display {
   font-size: 14px;
   line-height: 1.6;
   color: var(--text);
-  padding: 10px;
-  background-color: #f9f9f9;
-  border-radius: 6px;
+  padding: 15px;
+  background-color: var(--background-light);
+  border-radius: 8px;
+  border-left: 3px solid var(--primary-light);
 }
 
 /* Template Modal with Subject and Body */
 .template-label {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--text-light);
-  margin-bottom: 5px;
+  margin-bottom: 8px;
 }
 
 .template-subject-section {
-  margin-bottom: 15px;
+  margin-bottom: 20px;
 }
 
 .template-subject-content {
   font-weight: 500;
   color: var(--primary);
-  font-size: 15px;
-  padding: 8px 12px;
-  background-color: #f9f9f9;
-  border-radius: 6px;
+  font-size: 16px;
+  padding: 12px 15px;
+  background-color: var(--background-light);
+  border-radius: 8px;
   border-left: 3px solid var(--primary);
 }
 
@@ -1034,20 +1153,21 @@ body.editing-templates .links-display {
 }
 
 .template-modal-footer {
-  padding: 10px 15px;
+  padding: 15px;
   border-top: 1px solid var(--border);
   display: flex;
   justify-content: flex-end;
   gap: 10px;
+  background-color: var(--background-light);
 }
 
 .copy-template-button {
   background-color: var(--primary);
   color: white;
   border: none;
-  border-radius: 6px;
-  padding: 8px 16px;
-  font-size: 13px;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -1056,6 +1176,7 @@ body.editing-templates .links-display {
 .copy-template-button:hover {
   background-color: var(--primary-dark);
   transform: translateY(-1px);
+  box-shadow: 0 2px 5px rgba(106, 13, 173, 0.2);
 }
 
 .copy-all-button {
