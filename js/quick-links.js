@@ -2,8 +2,10 @@
 const QuickLinks = {
   STORAGE_KEY: 'jobAppHelperQuickLinks',
   TEMPLATES_KEY: 'jobAppHelperEmailTemplates',
+  JOBS_KEY: 'jobAppHelperSavedJobs',
   currentLinks: [],
   currentTemplates: {},
+  currentJobs: [],
   defaultLinks: [
     { id: 'link-1', type: 'linkedin', url: 'https://www.linkedin.com/in/mab-malik/', title: 'LinkedIn' },
     { id: 'link-2', type: 'website', url: 'https://abdullahmalik.me/', title: 'Personal Website' },
@@ -58,6 +60,7 @@ Best regards,
     this.saveTemplatesButton = document.getElementById('save-templates-button');
     this.cancelTemplatesButton = document.getElementById('cancel-templates-button');
     this.addLinkButton = document.getElementById('add-link-button');
+    this.addJobButton = document.getElementById('add-job-button');
     
     this.linksDisplayDiv = document.querySelector('.links-display');
     this.quickLinksEditDiv = document.querySelector('.quick-links-edit');
@@ -65,6 +68,16 @@ Best regards,
     this.dynamicLinksContainer = document.getElementById('dynamic-links-container');
     this.dynamicLinksList = document.getElementById('dynamic-links-list');
     this.noLinksMessage = document.getElementById('no-links-message');
+    
+    this.jobsContainer = document.getElementById('jobs-container');
+    this.noJobsMessage = document.getElementById('no-jobs-message');
+    
+    this.jobModalOverlay = document.getElementById('job-modal-overlay');
+    this.jobTitleInput = document.getElementById('job-title-input');
+    this.jobUrlInput = document.getElementById('job-url-input');
+    this.jobModalClose = document.getElementById('job-modal-close');
+    this.jobCancelButton = document.getElementById('job-cancel-button');
+    this.jobSaveButton = document.getElementById('job-save-button');
     
     this.followUpSubjectEditInput = document.getElementById('follow-up-subject-edit');
     this.followUpEditInput = document.getElementById('follow-up-edit');
@@ -83,6 +96,12 @@ Best regards,
     this.showTemplateModal = this.showTemplateModal.bind(this);
     this.addNewLinkInput = this.addNewLinkInput.bind(this);
     
+    // Job-related methods binding
+    this.openJobModal = this.openJobModal.bind(this);
+    this.closeJobModal = this.closeJobModal.bind(this);
+    this.saveJob = this.saveJob.bind(this);
+    this.deleteJob = this.deleteJob.bind(this);
+    
     // Set up event listeners
     this.editLinksButton.addEventListener('click', this.enterQuickLinksEditMode);
     this.editTemplatesButton.addEventListener('click', this.enterTemplatesEditMode);
@@ -91,6 +110,12 @@ Best regards,
     this.saveLinksButton.addEventListener('click', this.saveQuickLinks);
     this.saveTemplatesButton.addEventListener('click', this.saveTemplates);
     this.addLinkButton.addEventListener('click', this.addNewLinkInput);
+    
+    // Job modal event listeners
+    this.addJobButton.addEventListener('click', this.openJobModal);
+    this.jobModalClose.addEventListener('click', this.closeJobModal);
+    this.jobCancelButton.addEventListener('click', this.closeJobModal);
+    this.jobSaveButton.addEventListener('click', this.saveJob);
     
     // Set up click handlers for email template items
     this.templateItems.forEach(item => {
@@ -108,9 +133,49 @@ Best regards,
     // Load stored links and templates
     this.loadQuickLinks();
     this.loadEmailTemplates();
+    this.loadJobs();
     
     // Create modal elements for templates
     this.createTemplateModal();
+    
+    // Add event listener to close job modal on outside click
+    this.jobModalOverlay.addEventListener('click', (e) => {
+      if (e.target === this.jobModalOverlay) {
+        this.closeJobModal();
+      }
+    });
+    
+    // Set up Chrome runtime message listener for current tab URL
+    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+      if (request.action === 'getCurrentTabUrl') {
+        this.jobUrlInput.value = request.url;
+      }
+    });
+    
+    // Automatically query for the current tab URL
+    this.getCurrentTabUrl();
+  },
+  
+  // Get the current tab URL
+  getCurrentTabUrl() {
+    return new Promise((resolve) => {
+      chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+        if (tabs && tabs[0] && tabs[0].url) {
+          const url = tabs[0].url;
+          // Store the URL temporarily
+          this._currentTabUrl = url;
+          
+          // If the job URL input is already in the DOM, set its value
+          if (this.jobUrlInput) {
+            this.jobUrlInput.value = url;
+          }
+          
+          resolve(url);
+        } else {
+          resolve('');
+        }
+      });
+    });
   },
   
   async loadQuickLinks() {
@@ -153,6 +218,72 @@ Best regards,
     });
     
     this.updateTemplateItems();
+  },
+  
+  async loadJobs() {
+    const result = await chrome.storage.local.get(this.JOBS_KEY);
+    this.currentJobs = result[this.JOBS_KEY] || [];
+    this.renderJobItems();
+  },
+  
+  // Render all job items in the jobs container
+  renderJobItems() {
+    // Clear existing jobs except the no-jobs message
+    const children = Array.from(this.jobsContainer.children);
+    for (const child of children) {
+      if (child.id !== 'no-jobs-message') {
+        this.jobsContainer.removeChild(child);
+      }
+    }
+    
+    // Show or hide the no-jobs message based on jobs count
+    if (this.currentJobs.length === 0) {
+      this.noJobsMessage.style.display = 'block';
+    } else {
+      this.noJobsMessage.style.display = 'none';
+      
+      // Render each job
+      this.currentJobs.forEach(job => {
+        const jobElement = this.createJobElement(job);
+        this.jobsContainer.appendChild(jobElement);
+      });
+    }
+  },
+  
+  // Create a job DOM element
+  createJobElement(job) {
+    const jobElement = document.createElement('div');
+    jobElement.className = 'job-item';
+    jobElement.dataset.jobId = job.id;
+    
+    jobElement.innerHTML = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="job-logo" viewBox="0 0 16 16">
+        <path d="M6.5 1A1.5 1.5 0 0 0 5 2.5V3H1.5A1.5 1.5 0 0 0 0 4.5v8A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-8A1.5 1.5 0 0 0 14.5 3H11v-.5A1.5 1.5 0 0 0 9.5 1zm0 1h3a.5.5 0 0 1 .5.5V3H6v-.5a.5.5 0 0 1 .5-.5m1.886 6.914L15 7.151V12.5a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5V7.15l6.614 1.764a1.5 1.5 0 0 0 .772 0M1.5 4h13a.5.5 0 0 1 .5.5v1.616L8.129 7.948a.5.5 0 0 1-.258 0L1 6.116V4.5a.5.5 0 0 1 .5-.5"/>
+      </svg>
+      <div class="job-text">
+        <span class="job-title">${job.title}</span>
+        <span class="job-url">${job.url}</span>
+      </div>
+      <div class="job-actions">
+        <button class="job-delete-button" title="Delete Job">&times;</button>
+      </div>
+    `;
+    
+    // Add click handler to open the job URL
+    jobElement.addEventListener('click', (e) => {
+      if (!e.target.closest('.job-delete-button')) {
+        chrome.tabs.create({ url: job.url });
+      }
+    });
+    
+    // Add delete button handler
+    const deleteButton = jobElement.querySelector('.job-delete-button');
+    deleteButton.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.deleteJob(job.id);
+    });
+    
+    return jobElement;
   },
   
   renderLinkItems() {
@@ -234,6 +365,79 @@ Best regards,
         }
       }
     });
+  },
+  
+  // Job-related methods
+  async openJobModal() {
+    // Reset form fields
+    this.jobTitleInput.value = '';
+    
+    // Always get the current tab URL when opening the modal
+    const currentUrl = await this.getCurrentTabUrl();
+    this.jobUrlInput.value = currentUrl || '';
+    
+    // Show modal
+    this.jobModalOverlay.classList.add('show');
+    
+    // Focus on title field
+    setTimeout(() => this.jobTitleInput.focus(), 100);
+  },
+  
+  closeJobModal() {
+    this.jobModalOverlay.classList.remove('show');
+    
+    // Clear form fields
+    this.jobTitleInput.value = '';
+    this.jobUrlInput.value = '';
+  },
+  
+  async saveJob() {
+    const title = this.jobTitleInput.value.trim();
+    const url = this.jobUrlInput.value.trim();
+    
+    if (!title) {
+      alert('Please enter a job title.');
+      return;
+    }
+    
+    if (!url) {
+      alert('Please enter a job URL.');
+      return;
+    }
+    
+    const newJob = {
+      id: `job-${Date.now()}`,
+      title,
+      url,
+      dateAdded: new Date().toISOString()
+    };
+    
+    this.currentJobs.push(newJob);
+    
+    try {
+      await chrome.storage.local.set({ [this.JOBS_KEY]: this.currentJobs });
+      this.renderJobItems();
+      this.closeJobModal();
+      this.showToast('Job saved successfully!');
+    } catch (error) {
+      console.error('Error saving job:', error);
+      alert('Failed to save job. See console for details.');
+    }
+  },
+  
+  async deleteJob(jobId) {
+    if (confirm('Are you sure you want to delete this job?')) {
+      this.currentJobs = this.currentJobs.filter(job => job.id !== jobId);
+      
+      try {
+        await chrome.storage.local.set({ [this.JOBS_KEY]: this.currentJobs });
+        this.renderJobItems();
+        this.showToast('Job deleted successfully!');
+      } catch (error) {
+        console.error('Error deleting job:', error);
+        alert('Failed to delete job. See console for details.');
+      }
+    }
   },
   
   addNewLinkInput() {
@@ -661,27 +865,38 @@ Best regards,
   
   // Helper for showing toast messages
   showToast(message, type = 'success') {
-    // Empty implementation to remove toast notifications
-    return;
-    
-    // Original implementation commented out
-    /*
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
     toast.textContent = message;
+    toast.style.position = 'fixed';
+    toast.style.top = '20px';
+    toast.style.left = '50%';
+    toast.style.transform = 'translateX(-50%)';
+    toast.style.backgroundColor = type === 'success' ? 'var(--primary)' : 'var(--danger-red)';
+    toast.style.color = 'white';
+    toast.style.padding = '10px 16px';
+    toast.style.borderRadius = '8px';
+    toast.style.fontSize = '14px';
+    toast.style.fontWeight = '500';
+    toast.style.zIndex = '9999';
+    toast.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
+    toast.style.opacity = '0';
+    toast.style.transition = 'opacity 0.3s ease';
     
     document.body.appendChild(toast);
     
     setTimeout(() => {
-      toast.classList.add('show');
+      toast.style.opacity = '1';
     }, 10);
     
     setTimeout(() => {
-      toast.classList.remove('show');
+      toast.style.opacity = '0';
+      
       setTimeout(() => {
-        document.body.removeChild(toast);
+        if (document.body.contains(toast)) {
+          document.body.removeChild(toast);
+        }
       }, 300);
     }, 3000);
-    */
   }
 };
