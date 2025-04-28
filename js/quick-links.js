@@ -74,6 +74,7 @@ Best regards,
     
     this.jobModalOverlay = document.getElementById('job-modal-overlay');
     this.jobTitleInput = document.getElementById('job-title-input');
+    this.jobEmployerInput = document.getElementById('job-employer-input');
     this.jobUrlInput = document.getElementById('job-url-input');
     this.jobModalClose = document.getElementById('job-modal-close');
     this.jobCancelButton = document.getElementById('job-cancel-button');
@@ -116,6 +117,11 @@ Best regards,
     this.jobModalClose.addEventListener('click', this.closeJobModal);
     this.jobCancelButton.addEventListener('click', this.closeJobModal);
     this.jobSaveButton.addEventListener('click', this.saveJob);
+    
+    // Add keyboard event listeners for job modal
+    this.jobTitleInput.addEventListener('keydown', this.handleJobModalKeydown.bind(this));
+    this.jobEmployerInput.addEventListener('keydown', this.handleJobModalKeydown.bind(this));
+    this.jobUrlInput.addEventListener('keydown', this.handleJobModalKeydown.bind(this));
     
     // Set up click handlers for email template items
     this.templateItems.forEach(item => {
@@ -256,18 +262,28 @@ Best regards,
     jobElement.className = 'job-item';
     jobElement.dataset.jobId = job.id;
     
-    jobElement.innerHTML = `
+    // Create HTML for job item with employer
+    let jobHTML = `
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="job-logo" viewBox="0 0 16 16">
         <path d="M6.5 1A1.5 1.5 0 0 0 5 2.5V3H1.5A1.5 1.5 0 0 0 0 4.5v8A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-8A1.5 1.5 0 0 0 14.5 3H11v-.5A1.5 1.5 0 0 0 9.5 1zm0 1h3a.5.5 0 0 1 .5.5V3H6v-.5a.5.5 0 0 1 .5-.5m1.886 6.914L15 7.151V12.5a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5V7.15l6.614 1.764a1.5 1.5 0 0 0 .772 0M1.5 4h13a.5.5 0 0 1 .5.5v1.616L8.129 7.948a.5.5 0 0 1-.258 0L1 6.116V4.5a.5.5 0 0 1 .5-.5"/>
       </svg>
       <div class="job-text">
-        <span class="job-title">${job.title}</span>
+        <span class="job-title">${job.title}</span>`;
+        
+    // Only add employer if it exists
+    if (job.employer) {
+      jobHTML += `<span class="job-employer">${job.employer}</span>`;
+    }
+    
+    jobHTML += `
         <span class="job-url">${job.url}</span>
       </div>
       <div class="job-actions">
         <button class="job-delete-button" title="Delete Job">&times;</button>
       </div>
     `;
+    
+    jobElement.innerHTML = jobHTML;
     
     // Add click handler to open the job URL
     jobElement.addEventListener('click', (e) => {
@@ -393,6 +409,7 @@ Best regards,
   
   async saveJob() {
     const title = this.jobTitleInput.value.trim();
+    const employer = this.jobEmployerInput.value.trim();
     const url = this.jobUrlInput.value.trim();
     
     if (!title) {
@@ -408,6 +425,7 @@ Best regards,
     const newJob = {
       id: `job-${Date.now()}`,
       title,
+      employer,
       url,
       dateAdded: new Date().toISOString()
     };
@@ -898,5 +916,14 @@ Best regards,
         }
       }, 300);
     }, 3000);
+  },
+  
+  // Handle keyboard events in the job modal
+  handleJobModalKeydown(e) {
+    // If Enter key is pressed and not with modifier keys
+    if (e.key === 'Enter' && !e.ctrlKey && !e.shiftKey && !e.altKey && !e.metaKey) {
+      e.preventDefault();
+      this.saveJob();
+    }
   }
 };

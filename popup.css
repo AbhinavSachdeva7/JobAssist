@@ -1351,6 +1351,18 @@ body.editing-templates .links-display {
   margin-bottom: 3px;
 }
 
+.job-employer {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--primary);
+  margin-bottom: 3px;
+  display: block;
+}
+
+.job-item:hover .job-employer {
+  color: var(--primary-dark);
+}
+
 .job-url {
   font-size: 12px;
   color: var(--text-light);
