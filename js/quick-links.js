@@ -473,17 +473,16 @@ Best regards,
   },
   
   async deleteJob(jobId) {
-    if (confirm('Are you sure you want to delete this job?')) {
-      this.currentJobs = this.currentJobs.filter(job => job.id !== jobId);
-      
-      try {
-        await chrome.storage.local.set({ [this.JOBS_KEY]: this.currentJobs });
-        this.renderJobItems();
-        this.showToast('Job deleted successfully!');
-      } catch (error) {
-        console.error('Error deleting job:', error);
-        alert('Failed to delete job. See console for details.');
-      }
+    // Remove the job without confirmation
+    this.currentJobs = this.currentJobs.filter(job => job.id !== jobId);
+    
+    try {
+      await chrome.storage.local.set({ [this.JOBS_KEY]: this.currentJobs });
+      this.renderJobItems();
+      this.showToast('Job deleted successfully!');
+    } catch (error) {
+      console.error('Error deleting job:', error);
+      alert('Failed to delete job. See console for details.');
     }
   },
   
