@@ -76,6 +76,7 @@ Best regards,
     this.jobTitleInput = document.getElementById('job-title-input');
     this.jobEmployerInput = document.getElementById('job-employer-input');
     this.jobUrlInput = document.getElementById('job-url-input');
+    this.jobDateAppliedInput = document.getElementById('job-date-applied-input');
     this.jobModalClose = document.getElementById('job-modal-close');
     this.jobCancelButton = document.getElementById('job-cancel-button');
     this.jobSaveButton = document.getElementById('job-save-button');
@@ -275,8 +276,42 @@ Best regards,
       jobHTML += `<span class="job-employer copyable-job-field" data-copy-content="${job.employer}">${job.employer}</span>`;
     }
     
+    jobHTML += `<span class="job-url copyable-job-field" data-copy-content="${job.url}">${job.url}</span>`;
+    
+    // Add Date Applied if it exists
+    if (job.dateApplied) {
+      // Format the date manually to avoid timezone issues
+      let displayDate = "";
+      
+      try {
+        // Parse the date string directly (format is YYYY-MM-DD)
+        const [year, month, day] = job.dateApplied.split('-');
+        
+        // Create a readable date string using the month name
+        const monthNames = [
+          "January", "February", "March", "April", "May", "June",
+          "July", "August", "September", "October", "November", "December"
+        ];
+        
+        // Format as "Month Day, Year" - using parseInt to remove leading zeros
+        const monthIndex = parseInt(month, 10) - 1;
+        const formattedDay = parseInt(day, 10);
+        displayDate = `${monthNames[monthIndex]} ${formattedDay}, ${year}`;
+      } catch (e) {
+        console.error("Error formatting date:", e);
+        // Fallback to the raw date string if formatting fails
+        displayDate = job.dateApplied;
+      }
+      
+      jobHTML += `<span class="job-date-applied copyable-job-field" data-copy-content="${job.dateApplied}">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16" style="margin-right: 4px;">
+          <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4z"/>
+        </svg>
+        Applied: ${displayDate}
+      </span>`;
+    }
+    
     jobHTML += `
-        <span class="job-url copyable-job-field" data-copy-content="${job.url}">${job.url}</span>
       </div>
       <div class="job-actions">
         <button class="job-delete-button" title="Delete Job">&times;</button>
@@ -417,6 +452,13 @@ Best regards,
     this.jobTitleInput.value = '';
     this.jobEmployerInput.value = ''; // Ensure employer field is empty
     
+    // Set today's date as default for date applied
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    this.jobDateAppliedInput.value = `${year}-${month}-${day}`;
+    
     // Always get the current tab URL when opening the modal
     const currentUrl = await this.getCurrentTabUrl();
     this.jobUrlInput.value = currentUrl || '';
@@ -433,13 +475,16 @@ Best regards,
     
     // Clear form fields
     this.jobTitleInput.value = '';
+    this.jobEmployerInput.value = '';
     this.jobUrlInput.value = '';
+    this.jobDateAppliedInput.value = '';
   },
   
   async saveJob() {
     const title = this.jobTitleInput.value.trim();
     const employer = this.jobEmployerInput.value.trim();
     const url = this.jobUrlInput.value.trim();
+    const dateApplied = this.jobDateAppliedInput.value.trim();
     
     if (!title) {
       alert('Please enter a job title.');
@@ -456,6 +501,7 @@ Best regards,
       title,
       employer,
       url,
+      dateApplied,
       dateAdded: new Date().toISOString()
     };
     

@@ -349,7 +349,8 @@ label {
 
 input[type="text"],
 input[type="email"],
-input[type="url"] {
+input[type="url"],
+input[type="date"] {
   width: 100%;
   padding: 10px 12px;
   border: 1px solid var(--border);
@@ -365,7 +366,8 @@ input[type="url"] {
 
 input[type="text"]:focus,
 input[type="email"]:focus,
-input[type="url"]:focus {
+input[type="url"]:focus,
+input[type="date"]:focus {
   border-color: var(--primary);
   background-color: white;
   box-shadow: 0 0 0 3px rgba(106, 13, 173, 0.08);
@@ -1503,5 +1505,23 @@ body.editing-templates .links-display {
 
 .job-item {
   padding-bottom: 12px;
+}
+
+.job-date-applied {
+  font-size: 12px;
+  color: var(--text-light);
+  display: flex;
+  align-items: center;
+  margin-top: 2px;
+  font-weight: 400;
+}
+
+.job-date-applied svg {
+  color: var(--primary-light);
+  margin-right: 4px;
+}
+
+.job-item:hover .job-date-applied {
+  color: var(--primary);
 }
 
