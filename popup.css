@@ -1327,7 +1327,6 @@ body.editing-templates .links-display {
 }
 
 .job-item:hover {
-  background-color: #f2e6ff;
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
   transform: translateY(-1px);
 }
@@ -1531,16 +1530,6 @@ body.editing-templates .links-display {
 
 .copyable-job-field:hover {
   background-color: rgba(106, 13, 173, 0.08);
-}
-
-.copyable-job-field:hover::after {
-  content: 'Click to copy';
-  position: absolute;
-  font-size: 10px;
-  font-weight: 400;
-  color: var(--primary);
-  right: 6px;
-  opacity: 0.7;
 }
 
 .job-item {
