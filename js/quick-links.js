@@ -12,10 +12,10 @@ const QuickLinks = {
     { id: 'link-3', type: 'github', url: 'https://github.com/Abdullah-Malik', title: 'GitHub' }
   ],
   linkIcons: {
-    linkedin: 'linkedin.svg',
-    github: 'github.svg',
-    website: 'globe-americas.svg',
-    other: 'bi-link-45deg'
+    linkedin: '../images/linkedin.svg',
+    github: '../images/github.svg',
+    website: '../images/globe-americas.svg',
+    other: '../images/link-45deg.svg'
   },
   defaultTemplates: {
     'follow-up': {
@@ -368,8 +368,8 @@ Best regards,
     // Determine the correct icon to use
     let iconHtml;
     if (link.type === 'other') {
-      // Use the link-45deg.svg file instead of inline SVG
-      iconHtml = `<img src="link-45deg.svg" alt="Other Link" class="link-logo">`;
+      // Use the link-45deg.svg file with correct path
+      iconHtml = `<img src="../images/link-45deg.svg" alt="Other Link" class="link-logo">`;
     } else {
       // Use an external SVG file
       const iconFile = this.linkIcons[link.type] || this.linkIcons.other;
