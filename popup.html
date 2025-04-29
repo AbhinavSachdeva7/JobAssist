@@ -110,77 +110,93 @@
         <div class="jobs-section">
           <div class="section-header">
             <h3 class="section-title">Jobs</h3>
-            <button id="add-job-button" class="icon-button">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M8 0a1 1 0 0 1 1 1v6h6a1 1 0 1 1 0 2H9v6a1 1 0 1 1-2 0V9H1a1 1 0 0 1 0-2h6V1a1 1 0 0 1 1-1z"/>
-              </svg>
-              Add
-            </button>
+            <div class="section-actions">
+              <button id="download-jobs-button" class="icon-button" title="Download Jobs Data">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="stroke-width: 0.6; stroke: currentColor;">
+                  <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                  <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+                </svg>
+                Download
+              </button>
+              <button id="add-job-button" class="icon-button">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                  <path d="M8 0a1 1 0 0 1 1 1v6h6a1 1 0 1 1 0 2H9v6a1 1 0 1 1-2 0V9H1a1 1 0 0 1 0-2h6V1a1 1 0 0 1 1-1z"/>
+                </svg>
+                Add
+              </button>
+            </div>
           </div>
-          
           <div id="jobs-container">
-            <!-- Jobs will be dynamically added here -->
-            <div id="no-jobs-message" class="no-links-message" style="display: none;">
-              No jobs added yet. Click the '+' button to add a job.
+            <div id="no-jobs-message">
+              <span>No jobs saved yet. Add your first job!</span>
             </div>
           </div>
         </div>
       </div>
-
-      <!-- Quick Links Edit Form -->
-      <div class="links-edit quick-links-edit edit-mode-inactive">
-        <div class="edit-controls">
-          <button id="save-links-button" class="job-save-button">Save</button>
-          <button id="cancel-links-button" class="job-cancel-button">Cancel</button>
-        </div>
-        
-        <div id="dynamic-links-list">
-          <!-- Dynamic link inputs will be generated here -->
-        </div>
-        
-        <button id="add-link-button" class="add-link-button">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-            <path d="M8 0a1 1 0 0 1 1 1v6h6a1 1 0 1 1 0 2H9v6a1 1 0 1 1-2 0V9H1a1 1 0 0 1 0-2h6V1a1 1 0 0 1 1-1z"/>
-          </svg>
-          Add New Link
-        </button>
-      </div>
-      
-      <!-- Email Templates Edit Form -->
-      <div class="links-edit templates-edit edit-mode-inactive">
-        <div class="edit-controls">
-          <button id="save-templates-button" class="job-save-button">Save</button>
-          <button id="cancel-templates-button" class="job-cancel-button">Cancel</button>
-        </div>
-        <div class="form-group">
-          <label for="follow-up-subject-edit">Follow-up Email Subject</label>
-          <input type="text" id="follow-up-subject-edit" placeholder="Enter your follow-up email subject here...">
-        </div>
-        <div class="form-group">
-          <label for="follow-up-edit">Follow-up Email Body</label>
-          <textarea id="follow-up-edit" placeholder="Enter your follow-up email template here..." rows="4"></textarea>
-        </div>
-        <div class="form-group">
-          <label for="introduction-subject-edit">Introduction Email Subject</label>
-          <input type="text" id="introduction-subject-edit" placeholder="Enter your introduction email subject here...">
-        </div>
-        <div class="form-group">
-          <label for="introduction-edit">Introduction Email Body</label>
-          <textarea id="introduction-edit" placeholder="Enter your introduction email template here..." rows="4"></textarea>
-        </div>
-      </div>
     </div>
 
+    <!-- Quick Links Edit Form -->
+    <div class="links-edit quick-links-edit edit-mode-inactive">
+      <div class="edit-controls">
+        <button id="save-links-button" class="job-save-button">Save</button>
+        <button id="cancel-links-button" class="job-cancel-button">Cancel</button>
+      </div>
+      
+      <div id="dynamic-links-list">
+        <!-- Dynamic link inputs will be generated here -->
+      </div>
+      
+      <button id="add-link-button" class="add-link-button">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M8 0a1 1 0 0 1 1 1v6h6a1 1 0 1 1 0 2H9v6a1 1 0 1 1-2 0V9H1a1 1 0 0 1 0-2h6V1a1 1 0 0 1 1-1z"/>
+        </svg>
+        Add New Link
+      </button>
+    </div>
+    
+    <!-- Email Templates Edit Form -->
+    <div class="links-edit templates-edit edit-mode-inactive">
+      <div class="edit-controls">
+        <button id="save-templates-button" class="job-save-button">Save</button>
+        <button id="cancel-templates-button" class="job-cancel-button">Cancel</button>
+      </div>
+      <div class="form-group">
+        <label for="follow-up-subject-edit">Follow-up Email Subject</label>
+        <input type="text" id="follow-up-subject-edit" placeholder="Enter your follow-up email subject here...">
+      </div>
+      <div class="form-group">
+        <label for="follow-up-edit">Follow-up Email Body</label>
+        <textarea id="follow-up-edit" placeholder="Enter your follow-up email template here..." rows="4"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="introduction-subject-edit">Introduction Email Subject</label>
+        <input type="text" id="introduction-subject-edit" placeholder="Enter your introduction email subject here...">
+      </div>
+      <div class="form-group">
+        <label for="introduction-edit">Introduction Email Body</label>
+        <textarea id="introduction-edit" placeholder="Enter your introduction email template here..." rows="4"></textarea>
+      </div>
+    </div>
+    
     <!-- Contacts Tab -->
     <div id="contacts" class="tab-content">
       <div class="contacts-header">
         <h3>Contacts</h3>
-        <button id="show-add-contact-form" class="icon-button">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-            <path d="M8 0a1 1 0 0 1 1 1v6h6a1 1 0 1 1 0 2H9v6a1 1 0 1 1-2 0V9H1a1 1 0 0 1 0-2h6V1a1 1 0 0 1 1-1z"/>
-          </svg>
-          Add
-        </button>
+        <div class="section-actions">
+          <button id="download-contacts-button" class="icon-button" title="Download Contacts Data">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="stroke-width: 0.6; stroke: currentColor;">
+              <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+              <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+            </svg>
+            Download
+          </button>
+          <button id="show-add-contact-form" class="icon-button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M8 0a1 1 0 0 1 1 1v6h6a1 1 0 1 1 0 2H9v6a1 1 0 1 1-2 0V9H1a1 1 0 0 1 0-2h6V1a1 1 0 0 1 1-1z"/>
+            </svg>
+            Add
+          </button>
+        </div>
       </div>
       
       <div id="contacts-list">

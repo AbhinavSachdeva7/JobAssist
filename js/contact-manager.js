@@ -16,6 +16,7 @@ const ContactManager = {
     this.contactUrlInput = document.getElementById('contact-url');
     this.contactReachedOutInput = document.getElementById('contact-reached-out');
     this.contactsListDiv = document.getElementById('contacts-list');
+    this.downloadContactsButton = document.getElementById('download-contacts-button');
     
     // Log the DOM elements to debug
     console.log("DOM elements:", {
@@ -24,7 +25,8 @@ const ContactManager = {
       closeBtn: this.contactModalClose,
       saveBtn: this.saveContactButton,
       cancelBtn: this.cancelContactButton,
-      contactsList: this.contactsListDiv
+      contactsList: this.contactsListDiv,
+      downloadBtn: this.downloadContactsButton
     });
     
     // Bind methods to preserve context
@@ -32,6 +34,7 @@ const ContactManager = {
     this.showContactModal = this.showContactModal.bind(this);
     this.closeContactModal = this.closeContactModal.bind(this);
     this.toggleReachedOutStatus = this.toggleReachedOutStatus.bind(this);
+    this.downloadContactsData = this.downloadContactsData.bind(this);
     // Removed handleCancelContact binding as we're using closeContactModal instead
     
     // Set up event listeners
@@ -54,6 +57,11 @@ const ContactManager = {
     
     if (this.cancelContactButton) {
       this.cancelContactButton.addEventListener('click', this.closeContactModal);
+    }
+    
+    // Download contacts button event listener
+    if (this.downloadContactsButton) {
+      this.downloadContactsButton.addEventListener('click', this.downloadContactsData);
     }
     
     // Add keydown listeners for Enter key in inputs
@@ -585,5 +593,52 @@ const ContactManager = {
   showToast(message, type = 'success') {
     // Empty implementation to remove toast notifications
     return;
+  },
+
+  // Download Contacts data as CSV
+  async downloadContactsData() {
+    // Get contacts from storage
+    const result = await chrome.storage.local.get(this.STORAGE_KEY);
+    const contacts = result[this.STORAGE_KEY] || [];
+    
+    if (contacts.length === 0) {
+      this.showToast('No contacts data to download', 'error');
+      return;
+    }
+    
+    // Define CSV headers
+    const headers = ['Name', 'Email', 'Employer', 'URL', 'Reached Out'];
+    
+    // Create CSV content with headers
+    let csvContent = headers.join(',') + '\n';
+    
+    // Add contact data rows
+    contacts.forEach(contact => {
+      // Format the values and handle commas by wrapping in quotes if needed
+      const name = contact.name ? `"${contact.name.replace(/"/g, '""')}"` : '""';
+      const email = contact.email ? `"${contact.email.replace(/"/g, '""')}"` : '""';
+      const employer = contact.employer ? `"${contact.employer.replace(/"/g, '""')}"` : '""';
+      const url = contact.url ? `"${contact.url.replace(/"/g, '""')}"` : '""';
+      const reachedOut = contact.reachedOut ? 'Yes' : 'No';
+      
+      // Add the row to CSV content
+      csvContent += `${name},${email},${employer},${url},${reachedOut}\n`;
+    });
+    
+    // Create a Blob with the CSV data
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    
+    // Create a download link
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.setAttribute('download', `contacts_data_${new Date().toLocaleDateString().replace(/\//g, '-')}.csv`);
+    link.style.display = 'none';
+    
+    // Add to document, trigger click, and remove
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    this.showToast('Contacts data downloaded successfully!');
   }
 };

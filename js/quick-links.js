@@ -61,6 +61,7 @@ Best regards,
     this.cancelTemplatesButton = document.getElementById('cancel-templates-button');
     this.addLinkButton = document.getElementById('add-link-button');
     this.addJobButton = document.getElementById('add-job-button');
+    this.downloadJobsButton = document.getElementById('download-jobs-button');
     
     this.linksDisplayDiv = document.querySelector('.links-display');
     this.quickLinksEditDiv = document.querySelector('.quick-links-edit');
@@ -136,6 +137,11 @@ Best regards,
         }
       });
     });
+    
+    // Download jobs button event listener
+    if (this.downloadJobsButton) {
+      this.downloadJobsButton.addEventListener('click', this.downloadJobsData);
+    }
     
     // Load stored links and templates
     this.loadQuickLinks();
@@ -953,6 +959,49 @@ Best regards,
       console.error("Error saving templates:", error);
       alert("Failed to save templates. See console for details.");
     }
+  },
+  
+  // Download Jobs data as CSV
+  downloadJobsData() {
+    if (this.currentJobs.length === 0) {
+      this.showToast('No jobs data to download', 'error');
+      return;
+    }
+    
+    // Define CSV headers
+    const headers = ['Job Title', 'Employer', 'URL', 'Date Applied', 'Date Added'];
+    
+    // Create CSV content with headers
+    let csvContent = headers.join(',') + '\n';
+    
+    // Add job data rows
+    this.currentJobs.forEach(job => {
+      // Format the values and handle commas by wrapping in quotes if needed
+      const title = job.title ? `"${job.title.replace(/"/g, '""')}"` : '""';
+      const employer = job.employer ? `"${job.employer.replace(/"/g, '""')}"` : '""';
+      const url = job.url ? `"${job.url.replace(/"/g, '""')}"` : '""';
+      const dateApplied = job.dateApplied || '';
+      const dateAdded = job.dateAdded ? new Date(job.dateAdded).toLocaleDateString() : '';
+      
+      // Add the row to CSV content
+      csvContent += `${title},${employer},${url},${dateApplied},${dateAdded}\n`;
+    });
+    
+    // Create a Blob with the CSV data
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    
+    // Create a download link
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.setAttribute('download', `jobs_data_${new Date().toLocaleDateString().replace(/\//g, '-')}.csv`);
+    link.style.display = 'none';
+    
+    // Add to document, trigger click, and remove
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    this.showToast('Jobs data downloaded successfully!');
   },
   
   // Helper for showing toast messages
