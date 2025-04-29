@@ -1604,3 +1604,91 @@ body.editing-templates .links-display {
   height: 12px;
 }
 
+/* Redesigned toggle switch for "Reached Out" checkbox */
+.reached-out-toggle-container {
+  display: flex;
+  align-items: center;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  padding: 12px 16px;
+  background-color: #f8f5ff;
+  border-radius: 10px;
+  border: 1px solid rgba(106, 13, 173, 0.1);
+  transition: all 0.2s ease;
+}
+
+.reached-out-toggle-container:hover {
+  background-color: #f2e6ff;
+  border-color: rgba(106, 13, 173, 0.2);
+}
+
+.reached-out-toggle {
+  position: relative;
+  display: inline-block;
+  width: 46px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.reached-out-toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.reached-out-toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #e0e0e0;
+  transition: .3s;
+  border-radius: 24px;
+}
+
+.reached-out-toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .3s;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.reached-out-toggle input:checked + .reached-out-toggle-slider {
+  background-color: var(--primary);
+}
+
+.reached-out-toggle input:checked + .reached-out-toggle-slider:before {
+  transform: translateX(22px);
+}
+
+.reached-out-toggle-label {
+  margin-left: 12px;
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--text);
+  user-select: none;
+  cursor: pointer;
+  flex: 1;
+}
+
+.reached-out-icon {
+  margin-right: 8px;
+  color: var(--primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.reached-out-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
