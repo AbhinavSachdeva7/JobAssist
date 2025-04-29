@@ -14,6 +14,7 @@ const ContactManager = {
     this.contactEmailInput = document.getElementById('contact-email');
     this.contactEmployerInput = document.getElementById('contact-employer');
     this.contactUrlInput = document.getElementById('contact-url');
+    this.contactReachedOutInput = document.getElementById('contact-reached-out');
     this.contactsListDiv = document.getElementById('contacts-list');
     
     // Log the DOM elements to debug
@@ -30,6 +31,7 @@ const ContactManager = {
     this.handleAddContact = this.handleAddContact.bind(this);
     this.showContactModal = this.showContactModal.bind(this);
     this.closeContactModal = this.closeContactModal.bind(this);
+    this.toggleReachedOutStatus = this.toggleReachedOutStatus.bind(this);
     // Removed handleCancelContact binding as we're using closeContactModal instead
     
     // Set up event listeners
@@ -104,14 +106,14 @@ const ContactManager = {
       }
       
       savedContacts.forEach(contact => {
-        this.displayContact(contact.name, contact.email, contact.employer, contact.url);
+        this.displayContact(contact.name, contact.email, contact.employer, contact.url, contact.reachedOut);
       });
     } catch (error) {
       console.error("Error loading contacts:", error);
     }
   },
   
-  displayContact(name, email, employer, url) {
+  displayContact(name, email, employer, url, reachedOut = false) {
     // Remove the "No contacts" message if it exists
     const noContactsMsg = this.contactsListDiv.querySelector('p');
     if (noContactsMsg && noContactsMsg.textContent.includes('No contacts')) {
@@ -129,11 +131,25 @@ const ContactManager = {
     contactDiv.style.boxShadow = '0 1px 4px rgba(0, 0, 0, 0.05)';
     contactDiv.style.border = 'none';
     
+    // Create reached out status HTML with appropriate styling based on status
+    const reachedOutStatusHTML = `
+      <span class="contact-status ${reachedOut ? 'reached-out-yes' : 'reached-out-no'}" data-email="${email}">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+          ${reachedOut 
+            ? '<path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>'
+            : '<path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71z"/>'
+          }
+        </svg>
+        ${reachedOut ? 'Reached Out' : 'Not Contacted'}
+      </span>
+    `;
+
     contactDiv.innerHTML = `
       <strong class="contact-name">${name}</strong>
       <span class="contact-email clickable-email" data-email="${email}" style="cursor: pointer; text-decoration: none;">${email}</span>
       ${employer ? `<span class="contact-employer">Employer: ${employer}</span>` : ''}
       ${url ? `<span class="copyable-url" data-url="${url}" style="cursor: pointer; color: var(--primary); font-size: 12px; display: block; margin-top: 4px; margin-bottom: 4px; width: 100%; overflow: hidden; text-overflow: ellipsis; text-decoration: none; transition: all 0.2s ease;">${url}</span>` : ''}
+      ${reachedOutStatusHTML}
       <div style="display: flex; gap: 10px; margin-top: 10px; border: none; background: transparent; box-shadow: none; padding: 0;">
         <button class="email-button" data-email="${email}" title="Email ${name}" style="flex: 1;">Email</button>
         <button class="delete-button" data-email="${email}" title="Delete ${name}" style="flex: 1;">Delete</button>
@@ -169,6 +185,15 @@ const ContactManager = {
       const emailToDelete = e.target.getAttribute('data-email');
       this.deleteContact(emailToDelete);
     });
+
+    // Set up the toggle for reached out status
+    const statusIndicator = contactDiv.querySelector('.contact-status');
+    if (statusIndicator) {
+      statusIndicator.addEventListener('click', (e) => {
+        const email = e.currentTarget.getAttribute('data-email');
+        this.toggleReachedOutStatus(email);
+      });
+    }
 
     // Set up URL copy functionality if URL exists
     if (url) {
@@ -251,7 +276,7 @@ const ContactManager = {
     }
   },
   
-  async saveContact(name, email, employer, url) {
+  async saveContact(name, email, employer, url, reachedOut = false) {
     const result = await chrome.storage.local.get(this.STORAGE_KEY);
     const contacts = result[this.STORAGE_KEY] || [];
 
@@ -261,10 +286,34 @@ const ContactManager = {
       return false;
     }
 
-    contacts.push({ name, email, employer, url });
+    // Get the reached out status from checkbox if available
+    if (this.contactReachedOutInput) {
+      reachedOut = this.contactReachedOutInput.checked;
+    }
+
+    contacts.push({ name, email, employer, url, reachedOut });
     await chrome.storage.local.set({ [this.STORAGE_KEY]: contacts });
     this.showToast('Contact saved successfully!');
     return true;
+  },
+  
+  async toggleReachedOutStatus(email) {
+    const result = await chrome.storage.local.get(this.STORAGE_KEY);
+    let contacts = result[this.STORAGE_KEY] || [];
+    
+    // Find the contact and toggle its reached out status
+    const updatedContacts = contacts.map(contact => {
+      if (contact.email === email) {
+        return { ...contact, reachedOut: !contact.reachedOut };
+      }
+      return contact;
+    });
+    
+    // Save the updated contacts
+    await chrome.storage.local.set({ [this.STORAGE_KEY]: updatedContacts });
+    
+    // Refresh the contacts list to show updated status
+    this.loadContacts();
   },
   
   async deleteContact(emailToDelete) {

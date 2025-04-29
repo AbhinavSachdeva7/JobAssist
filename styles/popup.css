@@ -1525,3 +1525,82 @@ body.editing-templates .links-display {
   color: var(--primary);
 }
 
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
+.checkbox-group label {
+  margin-bottom: 0;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text);
+}
+
+.styled-checkbox {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  outline: none;
+  cursor: pointer;
+  position: relative;
+  background-color: white;
+  transition: all 0.2s ease;
+}
+
+.styled-checkbox:checked {
+  background-color: var(--primary);
+  border-color: var(--primary);
+}
+
+.styled-checkbox:checked::after {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 2px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.styled-checkbox:focus {
+  box-shadow: 0 0 0 3px rgba(106, 13, 173, 0.08);
+}
+
+/* Status indicator for reached out contacts */
+.contact-status {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 4px;
+  margin-bottom: 4px;
+  font-size: 12px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.reached-out-yes {
+  background-color: rgba(106, 13, 173, 0.1);
+  color: var(--primary);
+}
+
+.reached-out-no {
+  background-color: rgba(220, 53, 69, 0.1);
+  color: var(--text-light);
+}
+
+.contact-status svg {
+  margin-right: 4px;
+  width: 12px;
+  height: 12px;
+}
+
