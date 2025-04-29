@@ -3,9 +3,11 @@ const ContactManager = {
   STORAGE_KEY: 'jobAppHelperContacts',
   
   init() {
+    console.log("Initializing ContactManager...");
     // Cache DOM elements
     this.showAddContactFormButton = document.getElementById('show-add-contact-form');
-    this.addContactFormDiv = document.getElementById('add-contact-form');
+    this.contactModalOverlay = document.getElementById('contact-modal-overlay');
+    this.contactModalClose = document.getElementById('contact-modal-close');
     this.saveContactButton = document.getElementById('save-contact-button');
     this.cancelContactButton = document.getElementById('cancel-contact-button');
     this.contactNameInput = document.getElementById('contact-name');
@@ -13,19 +15,44 @@ const ContactManager = {
     this.contactEmployerInput = document.getElementById('contact-employer');
     this.contactUrlInput = document.getElementById('contact-url');
     this.contactsListDiv = document.getElementById('contacts-list');
-    this.deleteAllContactsButton = document.getElementById('delete-all-contacts');
+    
+    // Log the DOM elements to debug
+    console.log("DOM elements:", {
+      addButton: this.showAddContactFormButton,
+      modal: this.contactModalOverlay,
+      closeBtn: this.contactModalClose,
+      saveBtn: this.saveContactButton,
+      cancelBtn: this.cancelContactButton,
+      contactsList: this.contactsListDiv
+    });
     
     // Bind methods to preserve context
     this.handleAddContact = this.handleAddContact.bind(this);
-    this.showAddContactForm = this.showAddContactForm.bind(this);
-    this.handleDeleteAll = this.handleDeleteAll.bind(this);
-    this.handleCancelContact = this.handleCancelContact.bind(this);
+    this.showContactModal = this.showContactModal.bind(this);
+    this.closeContactModal = this.closeContactModal.bind(this);
+    // Removed handleCancelContact binding as we're using closeContactModal instead
     
     // Set up event listeners
-    this.showAddContactFormButton.addEventListener('click', this.showAddContactForm);
-    this.saveContactButton.addEventListener('click', this.handleAddContact);
-    this.deleteAllContactsButton.addEventListener('click', this.handleDeleteAll);
-    this.cancelContactButton.addEventListener('click', this.handleCancelContact);
+    if (this.showAddContactFormButton) {
+      this.showAddContactFormButton.addEventListener('click', () => {
+        console.log("Add contact button clicked");
+        this.showContactModal();
+      });
+    } else {
+      console.error("Add contact button not found in the DOM");
+    }
+    
+    if (this.contactModalClose) {
+      this.contactModalClose.addEventListener('click', this.closeContactModal);
+    }
+    
+    if (this.saveContactButton) {
+      this.saveContactButton.addEventListener('click', this.handleAddContact);
+    }
+    
+    if (this.cancelContactButton) {
+      this.cancelContactButton.addEventListener('click', this.closeContactModal);
+    }
     
     // Add keydown listeners for Enter key in inputs
     const contactInputs = [
@@ -33,7 +60,7 @@ const ContactManager = {
       this.contactEmailInput, 
       this.contactEmployerInput, 
       this.contactUrlInput
-    ];
+    ].filter(input => input !== null); // Filter out null elements
     
     contactInputs.forEach(input => {
       input.addEventListener('keydown', (event) => {
@@ -43,24 +70,45 @@ const ContactManager = {
         }
       });
     });
+
+    // Add event listener to close contact modal on outside click
+    if (this.contactModalOverlay) {
+      this.contactModalOverlay.addEventListener('click', (e) => {
+        if (e.target === this.contactModalOverlay) {
+          this.closeContactModal();
+        }
+      });
+    }
     
     // Load stored contacts
     this.loadContacts();
   },
   
   async loadContacts() {
-    const result = await chrome.storage.local.get(this.STORAGE_KEY);
-    const savedContacts = result[this.STORAGE_KEY] || [];
-    this.contactsListDiv.innerHTML = '';
-    
-    if (savedContacts.length === 0) {
-      this.contactsListDiv.innerHTML = '<p>No contacts saved yet.</p>';
-      return;
+    console.log("Loading contacts...");
+    try {
+      const result = await chrome.storage.local.get(this.STORAGE_KEY);
+      const savedContacts = result[this.STORAGE_KEY] || [];
+      console.log("Found contacts:", savedContacts);
+      
+      if (!this.contactsListDiv) {
+        console.error("Contacts list div not found");
+        return;
+      }
+      
+      this.contactsListDiv.innerHTML = '';
+      
+      if (savedContacts.length === 0) {
+        this.contactsListDiv.innerHTML = '<p>No contacts saved yet.</p>';
+        return;
+      }
+      
+      savedContacts.forEach(contact => {
+        this.displayContact(contact.name, contact.email, contact.employer, contact.url);
+      });
+    } catch (error) {
+      console.error("Error loading contacts:", error);
     }
-    
-    savedContacts.forEach(contact => {
-      this.displayContact(contact.name, contact.email, contact.employer, contact.url);
-    });
   },
   
   displayContact(name, email, employer, url) {
@@ -232,180 +280,193 @@ const ContactManager = {
     this.loadContacts();
   },
   
-  async showAddContactForm() {
-    try {
-      // Try to get the current tab URL
-      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-      if (tab && tab.url) {
-        // Pre-fill the URL field if it's a LinkedIn profile
-        if (tab.url.startsWith('https://www.linkedin.com/in/')) {
-          this.contactUrlInput.value = tab.url;
+  async showContactModal() {
+    console.log("Opening contact modal");
+    if (!this.contactModalOverlay) {
+      console.error("Contact modal overlay not found in the DOM");
+      return;
+    }
+    
+    // Try to get the current tab URL
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (tab && tab.url) {
+      // Pre-fill the URL field if it's a LinkedIn profile
+      if (tab.url.startsWith('https://www.linkedin.com/in/')) {
+        this.contactUrlInput.value = tab.url;
 
-          // --- Try to extract Name and Employer ---
-          try {
-            console.log("Attempting to extract Name and Employer from LinkedIn page...");
-            
-            // Execute script in the LinkedIn tab to get details
-            const results = await chrome.scripting.executeScript({
-              target: { tabId: tab.id },
-              func: () => {
-                
-                let companyName = ''; // Initialize company name
-                let personName = ''; // Initialize person name
-
-                // --- Extract Person's Name ---
-                try {
-                    // Primary selector for name (usually H1)
-                    const nameElement = document.querySelector('h1.text-heading-xlarge, h1'); // Prioritize specific class if known, fallback to generic h1
-                    // Add more fallbacks if needed:
-                    // const nameElement = document.querySelector('h1.text-heading-xlarge') || document.querySelector('h1') || document.querySelector('.pv-text-details__left-panel h1') || document.querySelector('.top-card-layout__title');
-                    
-                    if (nameElement && nameElement.innerText) {
-                        personName = nameElement.innerText.trim();
-                        console.log("DEBUG: Found person name:", personName);
-                    } else {
-                        console.log("DEBUG: Could not find person name element (h1).");
-                    }
-                } catch(nameError) {
-                    console.error("DEBUG: Error finding person name:", nameError);
-                }
-
-
-                // --- Extract Employer Name (using previous logic) ---
-                try {
-                    // Steps 1-4: Find the listContainerDiv (Context for employer search)
-                    let experienceHeader = null;
-                    const potentialHeaderSelectors = ['h2', 'h3', 'span', 'div']; 
-                    for (const selector of potentialHeaderSelectors) { 
-                      const elements = document.querySelectorAll(selector);
-                      for (const element of elements) {
-                        if (element.innerText && element.innerText.trim().split('\n')[0] === 'Experience') { 
-                          experienceHeader = element;
-                          break; 
-                        }
-                      }
-                      if (experienceHeader) break; 
-                    }
-                    
-                    if (experienceHeader) {
-                        const experienceSection = experienceHeader.closest('section.artdeco-card, section[data-section="experience"], div[data-view-name="profile-card-layout"], #experience-section, #experience, section');
-                        if (experienceSection) {
-                            const headerContainerDiv = experienceHeader.closest('section > div'); 
-                            if (headerContainerDiv) {
-                                let listContainerDiv = headerContainerDiv.nextElementSibling;
-                                while (listContainerDiv && listContainerDiv.tagName !== 'DIV') {
-                                  listContainerDiv = listContainerDiv.nextElementSibling;
-                                }
-                                
-                                if (listContainerDiv) {
-                                    // Step 5: Find the *first* SPAN using the BROAD XPath
-                                    let companyInfoSpan = null;
-                                    try {
-                                        const middleDot = '\u00B7'; // Unicode escape
-                                        const xpathExpression = `.//span[contains(., '${middleDot}')]`; 
-                                        // console.log("DEBUG: Executing BROAD XPath for company:", xpathExpression); // Optional logging
-                                        const xpathResult = document.evaluate(xpathExpression, listContainerDiv, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
-                                        companyInfoSpan = xpathResult.singleNodeValue; 
-                                    } catch (e) {
-                                        console.error("DEBUG: Error executing XPath for company:", e);
-                                    }
-
-                                    // Step 6: Process the found span
-                                    if (companyInfoSpan) { 
-                                        const rawText = companyInfoSpan.innerText ? companyInfoSpan.innerText.trim() : '';
-                                        // console.log("DEBUG: Raw innerText for company:", rawText); // Optional logging
-                                        const firstDotIndex = rawText.indexOf('\u00B7'); 
-                                        if (firstDotIndex !== -1) {
-                                            companyName = rawText.substring(0, firstDotIndex).trim();
-                                            // console.log("DEBUG: Extracted company name:", companyName); // Optional logging
-                                        } else {
-                                             console.log(`DEBUG: Middle dot not found in company raw text: "${rawText}"`);
-                                        }
-                                    } else {
-                                         console.log("DEBUG: Could not find company span using XPath.");
-                                    }
-                                } else { console.log("DEBUG: Could not find the list container div for company."); }
-                            } else { console.log("DEBUG: Could not find header container div for company."); }
-                        } else { console.log("DEBUG: Could not find parent section for company."); }
-                    } else { console.log("DEBUG: Could not find 'Experience' header for company."); }
-                } catch(companyError) {
-                     console.error("DEBUG: Error finding company name:", companyError);
-                }
-
-                // --- Return both pieces of information ---
-                return { 
-                  personName: personName, 
-                  companyName: companyName 
-                };
-
-              } // end of func
-            }); // end of executeScript
+        // --- Try to extract Name and Employer ---
+        try {
+          console.log("Attempting to extract Name and Employer from LinkedIn page...");
           
-            // --- Update Input Fields ---
-            if (results && results[0] && results[0].result) {
-              const extractedData = results[0].result;
-              console.log("Script extracted data:", extractedData); 
+          // Execute script in the LinkedIn tab to get details
+          const results = await chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            func: () => {
               
-              // Assign Person Name (assuming 'this.contactNameInput' is correct)
-              if (extractedData.personName) {
-                  this.contactNameInput.value = extractedData.personName;
-                  console.log("Populated Name field.");
-              } else {
-                   console.log("Could not populate Name field (name not found).");
-                   this.contactNameInput.value = ''; // Clear if not found
+              let companyName = ''; // Initialize company name
+              let personName = ''; // Initialize person name
+
+              // --- Extract Person's Name ---
+              try {
+                  // Primary selector for name (usually H1)
+                  const nameElement = document.querySelector('h1.text-heading-xlarge, h1'); // Prioritize specific class if known, fallback to generic h1
+                  
+                  if (nameElement && nameElement.innerText) {
+                      personName = nameElement.innerText.trim();
+                      console.log("DEBUG: Found person name:", personName);
+                  } else {
+                      console.log("DEBUG: Could not find person name element (h1).");
+                  }
+              } catch(nameError) {
+                  console.error("DEBUG: Error finding person name:", nameError);
               }
 
-              // Assign Company Name
-              if (extractedData.companyName) {
-                  this.contactEmployerInput.value = extractedData.companyName; 
-                  console.log("Populated Employer field.");
-              } else {
-                  console.log("Could not populate Employer field (company name not found/extracted).");
-                  this.contactEmployerInput.value = ''; // Clear if not found
+              // --- Extract Employer Name (using previous logic) ---
+              try {
+                  // Steps 1-4: Find the listContainerDiv (Context for employer search)
+                  let experienceHeader = null;
+                  const potentialHeaderSelectors = ['h2', 'h3', 'span', 'div']; 
+                  for (const selector of potentialHeaderSelectors) { 
+                    const elements = document.querySelectorAll(selector);
+                    for (const element of elements) {
+                      if (element.innerText && element.innerText.trim().split('\n')[0] === 'Experience') { 
+                        experienceHeader = element;
+                        break; 
+                      }
+                    }
+                    if (experienceHeader) break; 
+                  }
+                  
+                  if (experienceHeader) {
+                      const experienceSection = experienceHeader.closest('section.artdeco-card, section[data-section="experience"], div[data-view-name="profile-card-layout"], #experience-section, #experience, section');
+                      if (experienceSection) {
+                          const headerContainerDiv = experienceHeader.closest('section > div'); 
+                          if (headerContainerDiv) {
+                              let listContainerDiv = headerContainerDiv.nextElementSibling;
+                              while (listContainerDiv && listContainerDiv.tagName !== 'DIV') {
+                                listContainerDiv = listContainerDiv.nextElementSibling;
+                              }
+                              
+                              if (listContainerDiv) {
+                                  // Step 5: Find the *first* SPAN using the BROAD XPath
+                                  let companyInfoSpan = null;
+                                  try {
+                                      const middleDot = '\u00B7'; // Unicode escape
+                                      const xpathExpression = `.//span[contains(., '${middleDot}')]`; 
+                                      // console.log("DEBUG: Executing BROAD XPath for company:", xpathExpression); // Optional logging
+                                      const xpathResult = document.evaluate(xpathExpression, listContainerDiv, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
+                                      companyInfoSpan = xpathResult.singleNodeValue; 
+                                  } catch (e) {
+                                      console.error("DEBUG: Error executing XPath for company:", e);
+                                  }
+
+                                  // Step 6: Process the found span
+                                  if (companyInfoSpan) { 
+                                      const rawText = companyInfoSpan.innerText ? companyInfoSpan.innerText.trim() : '';
+                                      // console.log("DEBUG: Raw innerText for company:", rawText); // Optional logging
+                                      const firstDotIndex = rawText.indexOf('\u00B7'); 
+                                      if (firstDotIndex !== -1) {
+                                          companyName = rawText.substring(0, firstDotIndex).trim();
+                                          // console.log("DEBUG: Extracted company name:", companyName); // Optional logging
+                                      } else {
+                                           console.log(`DEBUG: Middle dot not found in company raw text: "${rawText}"`);
+                                      }
+                                  } else {
+                                       console.log("DEBUG: Could not find company span using XPath.");
+                                  }
+                              } else { console.log("DEBUG: Could not find the list container div for company."); }
+                          } else { console.log("DEBUG: Could not find header container div for company."); }
+                      } else { console.log("DEBUG: Could not find parent section for company."); }
+                  } else { console.log("DEBUG: Could not find 'Experience' header for company."); }
+              } catch(companyError) {
+                   console.error("DEBUG: Error finding company name:", companyError);
               }
 
+              // --- Return both pieces of information ---
+              return { 
+                personName: personName, 
+                companyName: companyName 
+              };
+
+            } // end of func
+          }); // end of executeScript
+        
+          // --- Update Input Fields ---
+          if (results && results[0] && results[0].result) {
+            const extractedData = results[0].result;
+            console.log("Script extracted data:", extractedData); 
+            
+            // Assign Person Name
+            if (extractedData.personName) {
+                this.contactNameInput.value = extractedData.personName;
+                console.log("Populated Name field.");
             } else {
-              console.log("Script execution failed or did not return a result object.");
-              this.contactNameInput.value = '';    // Clear fields on failure
-              this.contactEmployerInput.value = ''; 
+                 console.log("Could not populate Name field (name not found).");
+                 this.contactNameInput.value = ''; // Clear if not found
             }
-          
-          } catch (scriptError) {
-            // Log errors related to injecting the script or processing results
-            console.error("Error executing script or processing results:", scriptError);
-            this.contactNameInput.value = '';    // Clear fields on error
+
+            // Assign Company Name
+            if (extractedData.companyName) {
+                this.contactEmployerInput.value = extractedData.companyName; 
+                console.log("Populated Employer field.");
+            } else {
+                console.log("Could not populate Employer field (company name not found/extracted).");
+                this.contactEmployerInput.value = ''; // Clear if not found
+            }
+
+          } else {
+            console.log("Script execution failed or did not return a result object.");
+            this.contactNameInput.value = '';    // Clear fields on failure
             this.contactEmployerInput.value = ''; 
           }
-        // End: if (tab.url.startsWith('https://www.linkedin.com/in/'))
-        } else { 
-          // Not a LinkedIn profile URL, clear fields
-          console.log("Not a LinkedIn profile URL.");
-          this.contactUrlInput.value = tab.url || ''; // Show current URL or empty
-          this.contactNameInput.value = '';
-          this.contactEmployerInput.value = '';
+        
+        } catch (scriptError) {
+          // Log errors related to injecting the script or processing results
+          console.error("Error executing script or processing results:", scriptError);
+          this.contactNameInput.value = '';    // Clear fields on error
+          this.contactEmployerInput.value = ''; 
         }
-      // End: if (tab && tab.url)
-      } else {
-         console.log("Could not get active tab or URL.");
-         // Clear fields if tab info is unavailable
-         this.contactUrlInput.value = '';
-         this.contactNameInput.value = '';
-         this.contactEmployerInput.value = '';
+      // End: if (tab.url.startsWith('https://www.linkedin.com/in/'))
+      } else { 
+        // Not a LinkedIn profile URL, clear fields
+        console.log("Not a LinkedIn profile URL.");
+        this.contactUrlInput.value = tab.url || ''; // Show current URL or empty
+        this.contactNameInput.value = '';
+        this.contactEmployerInput.value = '';
       }
-    } catch (error) {
-      console.error("Error in showAddContactForm:", error);
-      // Clear fields on outer error
-      this.contactUrlInput.value = '';
-      this.contactNameInput.value = '';
-      this.contactEmployerInput.value = '';
+    // End: if (tab && tab.url)
+    } else {
+       console.log("Could not get active tab or URL.");
+       // Clear fields if tab info is unavailable
+       this.contactUrlInput.value = '';
+       this.contactNameInput.value = '';
+       this.contactEmployerInput.value = '';
     }
 
-    // Show the form and hide the button (existing logic)
-    this.addContactFormDiv.style.display = 'block';
-    this.showAddContactFormButton.style.display = 'none';
+    // Show the contact modal
+    this.contactModalOverlay.classList.add('show');
     
-    // Set focus to the name field (existing logic)
-    this.contactNameInput.focus();
+    // Set focus to the name field
+    if (this.contactNameInput) {
+      setTimeout(() => this.contactNameInput.focus(), 100);
+    }
+  },
+  
+  closeContactModal() {
+    console.log("Closing contact modal");
+    if (!this.contactModalOverlay) {
+      console.error("Contact modal overlay not found in the DOM");
+      return;
+    }
+    
+    // Hide the contact modal
+    this.contactModalOverlay.classList.remove('show');
+    
+    // Clear form fields
+    if (this.contactNameInput) this.contactNameInput.value = '';
+    if (this.contactEmailInput) this.contactEmailInput.value = '';
+    if (this.contactEmployerInput) this.contactEmployerInput.value = '';
+    if (this.contactUrlInput) this.contactUrlInput.value = '';
   },
   
   async handleAddContact() {
@@ -431,44 +492,14 @@ const ContactManager = {
     if (saved) {
       this.displayContact(name, email, employer, url);
       
-      // Clear form fields
-      this.contactNameInput.value = '';
-      this.contactEmailInput.value = '';
-      this.contactEmployerInput.value = '';
-      this.contactUrlInput.value = '';
-
-      // Hide form and show add button
-      this.addContactFormDiv.style.display = 'none';
-      this.showAddContactFormButton.style.display = 'block';
+      // Close the modal
+      this.closeContactModal();
       
       // Show the contact saved animation
       this.showContactSavedAnimation();
     }
   },
   
-  async handleDeleteAll() {
-    if (confirm('Are you sure you want to delete ALL contacts? This cannot be undone.')) {
-      await chrome.storage.local.remove(this.STORAGE_KEY);
-      
-      // Show the contact deleted animation instead of the toast
-      this.showContactDeletedAnimation();
-      
-      this.loadContacts();
-    }
-  },
-  
-  handleCancelContact() {
-    // Clear form fields
-    this.contactNameInput.value = '';
-    this.contactEmailInput.value = '';
-    this.contactEmployerInput.value = '';
-    this.contactUrlInput.value = '';
-
-    // Hide form and show add button
-    this.addContactFormDiv.style.display = 'none';
-    this.showAddContactFormButton.style.display = 'block';
-  },
-
   // Helper for showing contact deleted animation
   showContactDeletedAnimation() {
     const animationBar = document.getElementById('contact-deleted-animation');
@@ -501,7 +532,7 @@ const ContactManager = {
     }, 2000);
   },
 
-  // Helper for showing toast messages - disabled as requested
+  // Helper for showing toast messages
   showToast(message, type = 'success') {
     // Empty implementation to remove toast notifications
     return;

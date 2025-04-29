@@ -173,35 +173,14 @@
 
     <!-- Contacts Tab -->
     <div id="contacts" class="tab-content">
-      <button id="show-add-contact-form" class="btn btn-primary">Add New Contact</button>
-      
-      <div id="add-contact-form" style="display: none;">
-        <h3>Add New Contact</h3>
-        <div class="form-group">
-          <input type="text" id="contact-name" placeholder="Name">
-        </div>
-        <div class="form-group">
-          <input type="email" id="contact-email" placeholder="Email">
-        </div>
-        <div class="form-group">
-          <input type="text" id="contact-employer" placeholder="Employer (Optional)">
-        </div>
-        <div class="form-group">
-          <input type="url" id="contact-url" placeholder="LinkedIn/Website URL (Optional)">
-        </div>
-        <div class="form-buttons">
-          <button id="save-contact-button" class="btn btn-primary">Save</button>
-          <button id="cancel-contact-button" class="btn btn-secondary">Cancel</button>
-        </div>
-      </div>
-
-      <hr>
-      
       <div class="contacts-header">
-        <h3>Saved Contacts</h3>
-        <div class="delete-all-container">
-          <button id="delete-all-contacts" class="btn-danger btn-sm">Delete All</button>
-        </div>
+        <h3>Contacts</h3>
+        <button id="show-add-contact-form" class="icon-button">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M8 0a1 1 0 0 1 1 1v6h6a1 1 0 1 1 0 2H9v6a1 1 0 1 1-2 0V9H1a1 1 0 0 1 0-2h6V1a1 1 0 0 1 1-1z"/>
+          </svg>
+          Add
+        </button>
       </div>
       
       <div id="contacts-list">
@@ -240,6 +219,38 @@
       <div class="job-modal-footer">
         <button id="job-cancel-button" class="job-cancel-button">Cancel</button>
         <button id="job-save-button" class="job-save-button">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contact Modal -->
+  <div id="contact-modal-overlay" class="job-modal-overlay">
+    <div class="job-modal">
+      <div class="job-modal-header">
+        <h3 class="job-modal-title">Add Contact</h3>
+        <button id="contact-modal-close" class="job-modal-close">&times;</button>
+      </div>
+      <div class="job-modal-body">
+        <div class="form-group">
+          <label for="contact-name">Name</label>
+          <input type="text" id="contact-name" placeholder="Name">
+        </div>
+        <div class="form-group">
+          <label for="contact-email">Email</label>
+          <input type="email" id="contact-email" placeholder="Email">
+        </div>
+        <div class="form-group">
+          <label for="contact-employer">Employer</label>
+          <input type="text" id="contact-employer" placeholder="Employer (Optional)">
+        </div>
+        <div class="form-group">
+          <label for="contact-url">LinkedIn/Website URL</label>
+          <input type="url" id="contact-url" placeholder="LinkedIn/Website URL (Optional)">
+        </div>
+      </div>
+      <div class="job-modal-footer">
+        <button id="cancel-contact-button" class="job-cancel-button">Cancel</button>
+        <button id="save-contact-button" class="job-save-button">Save</button>
       </div>
     </div>
   </div>
