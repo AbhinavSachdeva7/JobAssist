@@ -129,6 +129,12 @@ body {
   display: flex;
   justify-content: flex-end;
   margin-bottom: 16px;
+  gap: 10px; /* Adding gap between buttons */
+}
+
+.edit-controls button {
+  min-width: 80px; /* Set minimum width for buttons */
+  padding: 10px 16px; /* Consistent padding */
 }
 
 .link-item {
@@ -443,7 +449,7 @@ input[type="url"]:focus {
 
 /* Style for the cancel button */
 #cancel-contact-button {
-  /* Removing specific styling to match the job-cancel-button class */
+  /* Remove specific styling to use job-cancel-button class styling */
 }
 
 hr {
@@ -1004,18 +1010,9 @@ body.editing-templates .links-display {
 }
 
 #cancel-templates-button {
-  background-color: transparent;
-  color: var(--text-light);
-  margin-right: 8px;
-  border: 1px solid var(--border);
-  transition: all 0.2s ease;
+  /* Remove specific styling to use job-cancel-button class styling */
 }
 
-#cancel-templates-button:hover {
-  background-color: #f5f5f5;
-}
-
-/* Style section divider for email templates */
 .templates-edit .form-section-divider {
   border-top: 1px solid var(--border);
   margin: 30px 0 20px;
