@@ -1520,3 +1520,30 @@ body.editing-templates .links-display {
   background-color: #f5f5f5;
 }
 
+.copyable-job-field {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 3px 6px;
+  margin: -3px -6px;
+  border-radius: 4px;
+  position: relative;
+}
+
+.copyable-job-field:hover {
+  background-color: rgba(106, 13, 173, 0.08);
+}
+
+.copyable-job-field:hover::after {
+  content: 'Click to copy';
+  position: absolute;
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--primary);
+  right: 6px;
+  opacity: 0.7;
+}
+
+.job-item {
+  padding-bottom: 12px;
+}
+

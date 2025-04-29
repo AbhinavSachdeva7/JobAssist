@@ -268,15 +268,15 @@ Best regards,
         <path d="M6.5 1A1.5 1.5 0 0 0 5 2.5V3H1.5A1.5 1.5 0 0 0 0 4.5v8A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-8A1.5 1.5 0 0 0 14.5 3H11v-.5A1.5 1.5 0 0 0 9.5 1zm0 1h3a.5.5 0 0 1 .5.5V3H6v-.5a.5.5 0 0 1 .5-.5m1.886 6.914L15 7.151V12.5a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5V7.15l6.614 1.764a1.5 1.5 0 0 0 .772 0M1.5 4h13a.5.5 0 0 1 .5.5v1.616L8.129 7.948a.5.5 0 0 1-.258 0L1 6.116V4.5a.5.5 0 0 1 .5-.5"/>
       </svg>
       <div class="job-text">
-        <span class="job-title">${job.title}</span>`;
+        <span class="job-title copyable-job-field" data-copy-content="${job.title}">${job.title}</span>`;
         
     // Only add employer if it exists
     if (job.employer) {
-      jobHTML += `<span class="job-employer">${job.employer}</span>`;
+      jobHTML += `<span class="job-employer copyable-job-field" data-copy-content="${job.employer}">${job.employer}</span>`;
     }
     
     jobHTML += `
-        <span class="job-url">${job.url}</span>
+        <span class="job-url copyable-job-field" data-copy-content="${job.url}">${job.url}</span>
       </div>
       <div class="job-actions">
         <button class="job-delete-button" title="Delete Job">&times;</button>
@@ -285,11 +285,14 @@ Best regards,
     
     jobElement.innerHTML = jobHTML;
     
-    // Add click handler to open the job URL
-    jobElement.addEventListener('click', (e) => {
-      if (!e.target.closest('.job-delete-button')) {
-        chrome.tabs.create({ url: job.url });
-      }
+    // Add click handlers for copyable fields
+    const copyableFields = jobElement.querySelectorAll('.copyable-job-field');
+    copyableFields.forEach(field => {
+      field.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const content = field.dataset.copyContent;
+        this.copyJobFieldToClipboard(content, field);
+      });
     });
     
     // Add delete button handler
@@ -300,6 +303,31 @@ Best regards,
     });
     
     return jobElement;
+  },
+  
+  // Method to copy job field content to clipboard with visual feedback
+  copyJobFieldToClipboard(text, element) {
+    navigator.clipboard.writeText(text).then(() => {
+      // Store original text and styling
+      const originalText = element.textContent;
+      const originalColor = element.style.color;
+      const originalFontWeight = element.style.fontWeight;
+      
+      // Show feedback
+      element.textContent = 'Copied!';
+      element.style.color = 'var(--primary)';
+      element.style.fontWeight = '600';
+      
+      // Reset after delay
+      setTimeout(() => {
+        element.textContent = originalText;
+        element.style.color = originalColor;
+        element.style.fontWeight = originalFontWeight;
+      }, 1000);
+      
+    }).catch(error => {
+      console.error('Failed to copy text: ', error);
+    });
   },
   
   renderLinkItems() {
@@ -387,6 +415,7 @@ Best regards,
   async openJobModal() {
     // Reset form fields
     this.jobTitleInput.value = '';
+    this.jobEmployerInput.value = ''; // Ensure employer field is empty
     
     // Always get the current tab URL when opening the modal
     const currentUrl = await this.getCurrentTabUrl();
