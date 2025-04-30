@@ -129,15 +129,12 @@ const ContactManager = {
     }
 
     const contactDiv = document.createElement('div');
+    contactDiv.className = 'contact-item';
     contactDiv.setAttribute('data-contact-email', email);
+
+    contactDiv.style.backgroundColor = "var(--background-light)";
     
-    // Add inline styles to ensure no border or shadow appears, with a light background color
-    contactDiv.style.padding = '16px';
-    contactDiv.style.marginBottom = '12px';
-    contactDiv.style.borderRadius = '10px';
-    contactDiv.style.backgroundColor = '#f9f5ff'; // Light purple background for better visibility
-    contactDiv.style.boxShadow = '0 1px 4px rgba(0, 0, 0, 0.05)';
-    contactDiv.style.border = 'none';
+    
     
     // Create reached out status HTML with appropriate styling based on status
     const reachedOutStatusHTML = `
