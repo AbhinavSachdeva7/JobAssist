@@ -658,7 +658,7 @@ body.editing-templates .links-display {
   }
 }
 
-#contacts-list p {
+#contacts-list p, #no-jobs-message p {
   text-align: center;
   padding: 16px;
   color: var(--text-light);
