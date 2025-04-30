@@ -1,37 +1,44 @@
-# Job Application Helper
+# JobAssist
 
-A Chrome extension designed to streamline your job application process by helping you manage important links, contacts, email templates, and job listings.
+[![Version](https://img.shields.io/badge/version-1.1-blue.svg)](https://github.com/abdullahmalik/jobassist)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Last Updated](https://img.shields.io/badge/last%20updated-April%202025-orange.svg)](https://github.com/abdullahmalik/jobassist)
 
-## Features
+A powerful Chrome extension that centralizes your job search process by organizing professional links, contacts, job listings, and email templates in one seamless interface.
 
-### Quick Links Management
-- Store and organize your professional profile links (LinkedIn, GitHub, Personal Website, etc.)
-- Add unlimited custom links with different link types
+![JobAssist Screenshot](images/screenshot.png)
+
+## ✨ Features
+
+### 🔗 Quick Links Management
+- Store and organize your professional profile links (LinkedIn, GitHub, Portfolio, etc.)
+- Add unlimited custom links with various preset types
 - One-click copy functionality for easy sharing
 - Fully customizable link titles and URLs
 
-### Job Tracking
-- Save job postings you're interested in with title, employer, and URL information
+### 💼 Job Tracking
+- Save job postings with title, employer, and URL information
 - Auto-capture the current webpage URL when adding a new job
+- Track application dates and status
 - Quick-copy functionality for job details
-- Easy management with one-click delete
 
-### Email Templates
+### ✉️ Email Templates
 - Pre-configured templates for follow-up and introduction emails
 - Customizable subjects and bodies
-- Quick copy functionality for subjects and full content
-- Perfect for consistent communication with recruiters and hiring managers
+- Quick copy functionality for efficient communication
+- Perfect for consistent outreach to recruiters and hiring managers
 
-### Contact Management
-- Store contact information for networking and follow-ups
-- Organize by name, email, employer, and website
-- Quick access to saved contacts
+### 👥 Contact Management
+- Store networking contacts with comprehensive details
+- LinkedIn integration for profile detection
+- Quick email composition with Gmail integration
+- Track outreach status with each contact
 
-## Installation
+## 🚀 Installation
 
 ### From Chrome Web Store
-1. Navigate to the Chrome Web Store
-2. Search for "Job Application Helper"
+1. Navigate to the [Chrome Web Store](https://chrome.google.com/webstore)
+2. Search for "JobAssist"
 3. Click "Add to Chrome"
 4. The extension icon will appear in your browser toolbar
 
@@ -42,51 +49,56 @@ A Chrome extension designed to streamline your job application process by helpin
 4. Click "Load unpacked" and select the extension directory
 5. The extension icon will appear in your browser toolbar
 
-## Usage
+## 📖 Usage
 
 ### Managing Quick Links
-1. Click on the extension icon in your browser toolbar
-2. Navigate to the "Resources" tab
-3. Click "Edit" next to "Quick Links"
+1. Click the JobAssist icon in your browser toolbar
+2. On the Home tab, find the Links section
+3. Click "Edit" to manage your links
 4. Add, modify, or remove links as needed
 5. Click "Save" when finished
 
 ### Tracking Jobs
-1. While on a job posting page, click the extension icon
-2. In the "Jobs" section, click the "+" button
-3. Enter the job title and employer (URL is auto-filled)
-4. Click "Save" or press Enter
-5. Click on any job field to copy it to clipboard
+1. While on a job posting page, click the JobAssist icon
+2. In the Jobs section, click the "+" button
+3. The job title, employer, and URL fields are pre-filled when possible
+4. Add any additional information
+5. Click "Save" to store the job
 
 ### Using Email Templates
-1. Click on the extension icon
-2. Navigate to the "Resources" tab
-3. Click on a template to open the full view
-4. Click "Copy Subject" or "Copy Body" to use in your emails
-5. To customize templates, click "Edit" next to "Email Templates"
+1. Click the JobAssist icon
+2. On the Home tab, scroll to Email Templates
+3. Click on a template to view the full content
+4. Use the copy buttons to quickly use in your emails
+5. Click "Edit" to customize your templates
 
 ### Managing Contacts
-1. Click on the extension icon
-2. Navigate to the "Contacts" tab
-3. Click "Add New Contact" to save someone's information
-4. View all saved contacts below
-5. Use the Email button to quickly start composing a message
+1. Click the JobAssist icon
+2. Navigate to the Contacts tab
+3. Click the "+" button to add a new contact
+4. LinkedIn profiles automatically populate relevant fields
+5. Toggle the "Reached Out" status to track your networking
 
-## Permissions
-This extension requires the following permissions:
-- storage: To save your links, jobs, templates, and contacts locally in your browser
-- tabs: To access the current tab's URL when adding a job
-- scripting: For enhanced functionality on supported websites
-- host_permissions: For integration with LinkedIn and Gmail
+## 🔒 Privacy & Data
 
-## Privacy
-All your data is stored locally in your browser using Chrome's storage API. No data is sent to external servers.
+All your data is stored locally in your browser using Chrome's storage API. No personal information is sent to external servers.
 
-## Support
-If you encounter any issues or have suggestions for improvement, please submit them to the support email or create an issue in the GitHub repository.
+You can export your data at any time using the download buttons in the Jobs and Contacts sections.
 
-## License
-[MIT License](LICENSE)
+## 🛠️ Permissions
+- **storage**: Saves your data locally in your browser
+- **tabs**: Accesses current tab URL for job and contact info
+- **scripting**: Enables LinkedIn profile data extraction
+- **host_permissions**: Provides LinkedIn and Gmail integration
 
-## Author
-Abdullah Malik
+## 💬 Support
+
+Found a bug or have a feature request? Please [create an issue](https://github.com/abdullahmalik/jobassist/issues) on the GitHub repository.
+
+## 📜 License
+
+This project is licensed under the [MIT License](LICENSE).
+
+## 👨‍💻 Author
+
+Created by [Abdullah Malik](https://github.com/abdullahmalik)
