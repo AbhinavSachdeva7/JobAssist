@@ -471,6 +471,122 @@ Best regards,
     const currentUrl = await this.getCurrentTabUrl();
     this.jobUrlInput.value = currentUrl || '';
     
+    // Check if this is a LinkedIn job page and extract job title and employer if it is
+    if (currentUrl && currentUrl.includes('linkedin.com/jobs/view')) {
+      try {
+        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+        if (tab && tab.id) {
+          // Execute script to extract job title and employer from LinkedIn page
+          const results = await chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            func: () => {
+              let jobTitle = '';
+              let companyName = '';
+              
+              // Extract job title
+              try {
+                const titleElement = document.querySelector('h1.t-24, h1.job-title, h1[data-test-job-title], h1');
+                if (titleElement && titleElement.textContent) {
+                  jobTitle = titleElement.textContent.trim();
+                  console.log("Found job title:", jobTitle);
+                }
+              } catch(titleError) {
+                console.error("Error finding job title:", titleError);
+              }
+              
+              // Extract company name - improved to handle more LinkedIn layouts
+              try {
+                // Try multiple possible selectors for company name with detailed logging
+                const companySelectors = [
+                  // New LinkedIn selectors
+                  'a[data-tracking-control-name="public_jobs_topcard-org-name"]',
+                  'span.jobs-unified-top-card__company-name',
+                  'a.jobs-unified-top-card__company-name',
+                  
+                  // Traditional selectors
+                  'a.company-name',
+                  'a[data-test-company-name]',
+                  'span.company-name',
+                  'span[data-test-company-name]',
+                  'div.company-name',
+                  'div[data-test-company-name]',
+                  
+                  // General fallback selectors that might contain company name
+                  '.jobs-unified-top-card__subtitle-primary-grouping a',
+                  '.jobs-unified-top-card__company-name a',
+                  '.job-details-jobs-unified-top-card__company-name'
+                ];
+                
+                console.log("Looking for company name with various selectors...");
+                let companyElement = null;
+                
+                for (const selector of companySelectors) {
+                  companyElement = document.querySelector(selector);
+                  if (companyElement && companyElement.textContent) {
+                    console.log(`Found company element with selector: ${selector}`);
+                    break;
+                  }
+                }
+                
+                // If we still don't have it, try a more aggressive approach
+                if (!companyElement || !companyElement.textContent.trim()) {
+                  console.log("Trying secondary approach for company name...");
+                  
+                  // Look for elements in the subtitle area that might contain the company name
+                  const subtitleElements = document.querySelectorAll('.jobs-unified-top-card__subtitle-primary-grouping a, .job-details-jobs-unified-top-card__primary-description-container a');
+                  for (let i = 0; i < subtitleElements.length; i++) {
+                    const element = subtitleElements[i];
+                    // Typically the company name is the first link in these sections
+                    if (element && element.textContent && !element.textContent.includes('followers') && !element.textContent.includes('reviews')) {
+                      companyElement = element;
+                      console.log("Found company name in subtitle element:", companyElement.textContent.trim());
+                      break;
+                    }
+                  }
+                }
+                
+                if (companyElement && companyElement.textContent) {
+                  companyName = companyElement.textContent.trim();
+                  // Clean up common patterns in LinkedIn company names
+                  companyName = companyName.replace(/\s*\([^)]*\)/, ''); // Remove content in parentheses
+                  companyName = companyName.replace(/\d+,?\d*\s*followers/, ''); // Remove "X followers"
+                  companyName = companyName.trim();
+                  console.log("Found company name:", companyName);
+                } else {
+                  console.log("Could not find company name with any selector");
+                }
+              } catch(companyError) {
+                console.error("Error finding company name:", companyError);
+              }
+              
+              return { jobTitle, companyName };
+            }
+          });
+          
+          // Update form fields if data was extracted
+          if (results && results[0] && results[0].result) {
+            const { jobTitle, companyName } = results[0].result;
+            
+            if (jobTitle) {
+              this.jobTitleInput.value = jobTitle;
+              console.log("Populated job title:", jobTitle);
+            }
+            
+            if (companyName) {
+              this.jobEmployerInput.value = companyName;
+              console.log("Populated employer name:", companyName);
+            } else {
+              console.log("Failed to extract company name");
+            }
+          } else {
+            console.log("No data extracted from LinkedIn page");
+          }
+        }
+      } catch(error) {
+        console.error("Error extracting job data from LinkedIn:", error);
+      }
+    }
+    
     // Show modal
     this.jobModalOverlay.classList.add('show');
     
