@@ -73,6 +73,11 @@ Best regards,
     this.jobsContainer = document.getElementById('jobs-container');
     this.noJobsMessage = document.getElementById('no-jobs-message');
     
+    // Job sorting elements
+    this.sortJobsButton = document.getElementById('sort-jobs-button');
+    this.sortJobsMenu = document.getElementById('sort-jobs-menu');
+    this.sortJobOptions = this.sortJobsMenu ? this.sortJobsMenu.querySelectorAll('.sort-option') : [];
+    
     this.jobModalOverlay = document.getElementById('job-modal-overlay');
     this.jobTitleInput = document.getElementById('job-title-input');
     this.jobEmployerInput = document.getElementById('job-employer-input');
@@ -89,6 +94,9 @@ Best regards,
     
     this.templateItems = document.querySelectorAll('.email-template-item');
     
+    // Current sort option (default to most recent)
+    this.currentJobSortOption = 'recent';
+    
     // Bind methods to preserve context
     this.enterQuickLinksEditMode = this.enterQuickLinksEditMode.bind(this);
     this.enterTemplatesEditMode = this.enterTemplatesEditMode.bind(this);
@@ -104,6 +112,11 @@ Best regards,
     this.closeJobModal = this.closeJobModal.bind(this);
     this.saveJob = this.saveJob.bind(this);
     this.deleteJob = this.deleteJob.bind(this);
+    
+    // Job sorting related bindings
+    this.toggleJobSortMenu = this.toggleJobSortMenu.bind(this);
+    this.handleJobSortOptionClick = this.handleJobSortOptionClick.bind(this);
+    this.handleJobClickOutside = this.handleJobClickOutside.bind(this);
     
     // Set up event listeners
     this.editLinksButton.addEventListener('click', this.enterQuickLinksEditMode);
@@ -124,6 +137,24 @@ Best regards,
     this.jobTitleInput.addEventListener('keydown', this.handleJobModalKeydown.bind(this));
     this.jobEmployerInput.addEventListener('keydown', this.handleJobModalKeydown.bind(this));
     this.jobUrlInput.addEventListener('keydown', this.handleJobModalKeydown.bind(this));
+    
+    // Set up sort jobs button and options
+    if (this.sortJobsButton) {
+      this.sortJobsButton.addEventListener('click', this.toggleJobSortMenu);
+    }
+    
+    // Add click listeners for sort options
+    if (this.sortJobOptions) {
+      this.sortJobOptions.forEach(option => {
+        option.addEventListener('click', () => {
+          const sortValue = option.getAttribute('data-sort');
+          this.handleJobSortOptionClick(sortValue);
+        });
+      });
+    }
+    
+    // Add global click listener to close the sort menu when clicking outside
+    document.addEventListener('click', this.handleJobClickOutside);
     
     // Set up click handlers for email template items
     this.templateItems.forEach(item => {
@@ -629,7 +660,8 @@ Best regards,
       dateAdded: new Date().toISOString()
     };
     
-    this.currentJobs.push(newJob);
+    // Add new job to the beginning of the array instead of the end
+    this.currentJobs.unshift(newJob);
     
     try {
       await chrome.storage.local.set({ [this.JOBS_KEY]: this.currentJobs });
@@ -1166,5 +1198,90 @@ Best regards,
       e.preventDefault();
       this.saveJob();
     }
-  }
+  },
+
+  // Toggle job sort menu visibility
+  toggleJobSortMenu(event) {
+    event.stopPropagation();
+    this.sortJobsMenu.classList.toggle('active');
+    
+    // Update active class on the current sort option
+    this.updateActiveJobSortOption();
+  },
+  
+  // Handle job sort option click
+  handleJobSortOptionClick(sortValue) {
+    // Set current sort option
+    this.currentJobSortOption = sortValue;
+    
+    // Hide the menu
+    this.sortJobsMenu.classList.remove('active');
+    
+    // Update active state on options
+    this.updateActiveJobSortOption();
+    
+    // Sort and reload jobs with new sort order
+    this.sortAndRenderJobs();
+  },
+  
+  // Handle clicks outside the job sort menu
+  handleJobClickOutside(event) {
+    if (this.sortJobsMenu && this.sortJobsMenu.classList.contains('active') && 
+        event.target !== this.sortJobsButton && 
+        !this.sortJobsMenu.contains(event.target)) {
+      this.sortJobsMenu.classList.remove('active');
+    }
+  },
+  
+  // Update which job sort option is marked as active
+  updateActiveJobSortOption() {
+    if (this.sortJobOptions) {
+      this.sortJobOptions.forEach(option => {
+        const sortValue = option.getAttribute('data-sort');
+        if (sortValue === this.currentJobSortOption) {
+          option.classList.add('active');
+        } else {
+          option.classList.remove('active');
+        }
+      });
+    }
+  },
+
+  // Sort jobs based on the selected option
+  sortJobs(jobs, sortOption) {
+    console.log("Sorting jobs by:", sortOption);
+    switch(sortOption) {
+      case 'employer':
+        // Put jobs with no employer at the bottom
+        return [...jobs].sort((a, b) => {
+          if (!a.employer && !b.employer) return 0;
+          if (!a.employer) return 1;
+          if (!b.employer) return -1;
+          return a.employer.localeCompare(b.employer);
+        });
+      case 'recent':
+      default:
+        // Sort by dateAdded (most recent first)
+        return [...jobs].sort((a, b) => {
+          if (a.dateAdded && b.dateAdded) {
+            return new Date(b.dateAdded) - new Date(a.dateAdded);
+          } else if (a.dateAdded) {
+            return -1;
+          } else if (b.dateAdded) {
+            return 1;
+          }
+          return 0;
+        });
+    }
+  },
+  
+  // Sort and render jobs
+  sortAndRenderJobs() {
+    // Sort jobs based on current sort option
+    const sortedJobs = this.sortJobs(this.currentJobs, this.currentJobSortOption);
+    this.currentJobs = sortedJobs;
+    
+    // Re-render the job list
+    this.renderJobItems();
+  },
 };
