@@ -277,11 +277,11 @@ Best regards,
         </svg>
       </div>
       <div class="job-text">
-        <span class="job-title copyable-job-field" data-copy-content="${job.title}">${job.title}</span>`;
+        <span class="job-title copyable-job-field" data-copy-content="${job.employer}">${job.employer}</span>`;
         
     // Only add employer if it exists
     if (job.employer) {
-      jobHTML += `<span class="job-employer copyable-job-field" data-copy-content="${job.employer}">${job.employer}</span>`;
+      jobHTML += `<span class="job-employer copyable-job-field" data-copy-content="${job.title}">${job.title}</span>`;
     }
     
     jobHTML += `<span class="job-url copyable-job-field" data-copy-content="${job.url}">${job.url}</span>`;
