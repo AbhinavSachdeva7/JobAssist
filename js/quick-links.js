@@ -642,16 +642,16 @@ Best regards,
     const employer = this.jobEmployerInput.value.trim();
     const url = this.jobUrlInput.value.trim();
     const dateApplied = this.jobDateAppliedInput.value.trim();
-    
-    if (!title) {
-      showInputError(this.jobTitleInput, 'Please enter a job title');
-      this.jobTitleInput.focus();
+
+    if (!employer) {
+      showInputError(this.jobEmployerInput, 'Please enter the employer name');
+      this.jobEmployerInput.focus();
       return;
     }
 
-    if (!employer) {
-      showInputError(this.jobEmployerInput, 'Please enter w employer name');
-      this.jobEmployerInput.focus();
+    if (!title) {
+      showInputError(this.jobTitleInput, 'Please enter the job title');
+      this.jobTitleInput.focus();
       return;
     }
     
