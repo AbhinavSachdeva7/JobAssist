@@ -112,13 +112,13 @@ const ContactManager = {
     });
 
     // Add event listener to close contact modal on outside click
-    // if (this.contactModalOverlay) {
-    //   this.contactModalOverlay.addEventListener('click', (e) => {
-    //     if (e.target === this.contactModalOverlay) {
-    //       this.closeContactModal();
-    //     }
-    //   });
-    // }
+    if (this.contactModalOverlay) {
+      this.contactModalOverlay.addEventListener('click', (e) => {
+        if (e.target === this.contactModalOverlay) {
+          this.closeContactModal();
+        }
+      });
+    }
     
     // Load stored contacts
     this.loadContacts();
@@ -634,6 +634,35 @@ const ContactManager = {
     if (this.contactEmployerInput) this.contactEmployerInput.value = '';
     if (this.contactUrlInput) this.contactUrlInput.value = '';
   },
+
+  showInputError(inputElement, message) {
+    // Add error class to the input
+    inputElement.classList.add('input-error');
+    
+    // Create or update error message
+    let errorMessage = inputElement.parentNode.querySelector('.error-message');
+    
+    if (!errorMessage) {
+      errorMessage = document.createElement('div');
+      errorMessage.className = 'error-message';
+      inputElement.parentNode.appendChild(errorMessage);
+    }
+    
+    errorMessage.textContent = message;
+    errorMessage.style.color = '#e74c3c';
+    errorMessage.style.fontSize = '12px';
+    errorMessage.style.marginTop = '4px';
+    
+    // Add input event listener to clear error when user types
+    inputElement.addEventListener('input', function clearError() {
+      inputElement.classList.remove('input-error');
+      if (errorMessage) {
+        errorMessage.remove();
+      }
+      // Remove this listener after it executes once
+      inputElement.removeEventListener('input', clearError);
+    }, { once: true });
+  },
   
   async handleAddContact() {
     const name = this.contactNameInput.value.trim();
@@ -641,21 +670,21 @@ const ContactManager = {
     const employer = this.contactEmployerInput.value.trim();
     const url = this.contactUrlInput.value.trim();
 
-    // Basic validation
+    // Basic validation with visual feedback
     if (!name) {
-      this.showToast('Please enter a name', 'error');
+      this.showInputError(this.contactNameInput, 'Please enter a name');
       this.contactNameInput.focus();
       return;
     }
     
     if (!email || !email.includes('@') || !email.includes('.')) {
-      this.showToast('Please enter a valid email address', 'error');
+      this.showInputError(this.contactEmailInput, 'Please enter a valid email address');
       this.contactEmailInput.focus();
       return;
     }
 
     const saved = await this.saveContact(name, email, employer, url);
-    if (saved) {
+  if (saved) {
       // Close the modal
       this.closeContactModal();
       

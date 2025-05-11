@@ -1809,3 +1809,7 @@ body.editing-templates .links-display {
   color: var(--primary);
 }
 
+.input-error {
+  border: 2px solid #e74c3c !important;
+  background-color: rgba(231, 76, 60, 0.05) !important;
+}
