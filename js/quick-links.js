@@ -7,9 +7,9 @@ const QuickLinks = {
   currentTemplates: {},
   currentJobs: [],
   defaultLinks: [
-    { id: 'link-1', type: 'linkedin', url: 'https://www.linkedin.com/in/mab-malik/', title: 'LinkedIn' },
-    { id: 'link-2', type: 'website', url: 'https://abdullahmalik.me/', title: 'Personal Website' },
-    { id: 'link-3', type: 'github', url: 'https://github.com/Abdullah-Malik', title: 'GitHub' }
+    { id: 'link-1', type: 'linkedin', url: 'https://www.linkedin.com/in/example/', title: 'LinkedIn' },
+    { id: 'link-2', type: 'website', url: 'https://example.com/', title: 'Personal Website' },
+    { id: 'link-3', type: 'github', url: 'https://github.com/example', title: 'GitHub' }
   ],
   linkIcons: {
     linkedin: '../images/linkedin.svg',

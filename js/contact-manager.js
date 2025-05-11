@@ -112,13 +112,13 @@ const ContactManager = {
     });
 
     // Add event listener to close contact modal on outside click
-    if (this.contactModalOverlay) {
-      this.contactModalOverlay.addEventListener('click', (e) => {
-        if (e.target === this.contactModalOverlay) {
-          this.closeContactModal();
-        }
-      });
-    }
+    // if (this.contactModalOverlay) {
+    //   this.contactModalOverlay.addEventListener('click', (e) => {
+    //     if (e.target === this.contactModalOverlay) {
+    //       this.closeContactModal();
+    //     }
+    //   });
+    // }
     
     // Load stored contacts
     this.loadContacts();
