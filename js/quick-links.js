@@ -1,5 +1,7 @@
+import { showInputError } from './form-utils.js';
+
 // Quick Links Module
-const QuickLinks = {
+export const QuickLinks = {
   STORAGE_KEY: 'jobAppHelperQuickLinks',
   TEMPLATES_KEY: 'jobAppHelperEmailTemplates',
   JOBS_KEY: 'jobAppHelperSavedJobs',
@@ -622,7 +624,7 @@ Best regards,
     this.jobModalOverlay.classList.add('show');
     
     // Focus on title field
-    setTimeout(() => this.jobTitleInput.focus(), 100);
+    setTimeout(() => this.jobEmployerInput.focus(), 100);
   },
   
   closeJobModal() {
@@ -642,13 +644,21 @@ Best regards,
     const dateApplied = this.jobDateAppliedInput.value.trim();
     
     if (!title) {
-      alert('Please enter a job title.');
+      showInputError(this.jobTitleInput, 'Please enter a job title');
+      this.jobTitleInput.focus();
+      return;
+    }
+
+    if (!employer) {
+      showInputError(this.jobEmployerInput, 'Please enter w employer name');
+      this.jobEmployerInput.focus();
       return;
     }
     
     if (!url) {
-      alert('Please enter a job URL.');
-      return;
+        showInputError(this.jobUrlInput, 'Please enter a job URL');
+        this.jobUrlInput.focus();
+        return;
     }
     
     const newJob = {
