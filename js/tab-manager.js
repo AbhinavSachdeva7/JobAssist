@@ -1,5 +1,5 @@
 // Tab Manager Module
-const TabManager = {
+export const TabManager = {
   init() {
     const tabButtons = document.querySelectorAll('.tab-button');
     const tabContents = document.querySelectorAll('.tab-content');
