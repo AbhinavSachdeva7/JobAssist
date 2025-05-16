@@ -1,5 +1,7 @@
+import { showInputError } from './form-utils.js';
+
 // Quick Links Module
-const QuickLinks = {
+export const QuickLinks = {
   STORAGE_KEY: 'jobAppHelperQuickLinks',
   TEMPLATES_KEY: 'jobAppHelperEmailTemplates',
   JOBS_KEY: 'jobAppHelperSavedJobs',
@@ -7,9 +9,9 @@ const QuickLinks = {
   currentTemplates: {},
   currentJobs: [],
   defaultLinks: [
-    { id: 'link-1', type: 'linkedin', url: 'https://www.linkedin.com/in/mab-malik/', title: 'LinkedIn' },
-    { id: 'link-2', type: 'website', url: 'https://abdullahmalik.me/', title: 'Personal Website' },
-    { id: 'link-3', type: 'github', url: 'https://github.com/Abdullah-Malik', title: 'GitHub' }
+    { id: 'link-1', type: 'linkedin', url: 'https://www.linkedin.com/in/example/', title: 'LinkedIn' },
+    { id: 'link-2', type: 'website', url: 'https://example.com/', title: 'Personal Website' },
+    { id: 'link-3', type: 'github', url: 'https://github.com/example', title: 'GitHub' }
   ],
   linkIcons: {
     linkedin: '../images/linkedin.svg',
@@ -73,6 +75,11 @@ Best regards,
     this.jobsContainer = document.getElementById('jobs-container');
     this.noJobsMessage = document.getElementById('no-jobs-message');
     
+    // Job sorting elements
+    this.sortJobsButton = document.getElementById('sort-jobs-button');
+    this.sortJobsMenu = document.getElementById('sort-jobs-menu');
+    this.sortJobOptions = this.sortJobsMenu ? this.sortJobsMenu.querySelectorAll('.sort-option') : [];
+    
     this.jobModalOverlay = document.getElementById('job-modal-overlay');
     this.jobTitleInput = document.getElementById('job-title-input');
     this.jobEmployerInput = document.getElementById('job-employer-input');
@@ -89,6 +96,9 @@ Best regards,
     
     this.templateItems = document.querySelectorAll('.email-template-item');
     
+    // Current sort option (default to most recent)
+    this.currentJobSortOption = 'recent';
+    
     // Bind methods to preserve context
     this.enterQuickLinksEditMode = this.enterQuickLinksEditMode.bind(this);
     this.enterTemplatesEditMode = this.enterTemplatesEditMode.bind(this);
@@ -104,6 +114,11 @@ Best regards,
     this.closeJobModal = this.closeJobModal.bind(this);
     this.saveJob = this.saveJob.bind(this);
     this.deleteJob = this.deleteJob.bind(this);
+    
+    // Job sorting related bindings
+    this.toggleJobSortMenu = this.toggleJobSortMenu.bind(this);
+    this.handleJobSortOptionClick = this.handleJobSortOptionClick.bind(this);
+    this.handleJobClickOutside = this.handleJobClickOutside.bind(this);
     
     // Set up event listeners
     this.editLinksButton.addEventListener('click', this.enterQuickLinksEditMode);
@@ -124,6 +139,24 @@ Best regards,
     this.jobTitleInput.addEventListener('keydown', this.handleJobModalKeydown.bind(this));
     this.jobEmployerInput.addEventListener('keydown', this.handleJobModalKeydown.bind(this));
     this.jobUrlInput.addEventListener('keydown', this.handleJobModalKeydown.bind(this));
+    
+    // Set up sort jobs button and options
+    if (this.sortJobsButton) {
+      this.sortJobsButton.addEventListener('click', this.toggleJobSortMenu);
+    }
+    
+    // Add click listeners for sort options
+    if (this.sortJobOptions) {
+      this.sortJobOptions.forEach(option => {
+        option.addEventListener('click', () => {
+          const sortValue = option.getAttribute('data-sort');
+          this.handleJobSortOptionClick(sortValue);
+        });
+      });
+    }
+    
+    // Add global click listener to close the sort menu when clicking outside
+    document.addEventListener('click', this.handleJobClickOutside);
     
     // Set up click handlers for email template items
     this.templateItems.forEach(item => {
@@ -271,15 +304,17 @@ Best regards,
     
     // Create HTML for job item with employer
     let jobHTML = `
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="job-logo" viewBox="0 0 16 16">
-        <path d="M6.5 1A1.5 1.5 0 0 0 5 2.5V3H1.5A1.5 1.5 0 0 0 0 4.5v8A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-8A1.5 1.5 0 0 0 14.5 3H11v-.5A1.5 1.5 0 0 0 9.5 1zm0 1h3a.5.5 0 0 1 .5.5V3H6v-.5a.5.5 0 0 1 .5-.5m1.886 6.914L15 7.151V12.5a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5V7.15l6.614 1.764a1.5 1.5 0 0 0 .772 0M1.5 4h13a.5.5 0 0 1 .5.5v1.616L8.129 7.948a.5.5 0 0 1-.258 0L1 6.116V4.5a.5.5 0 0 1 .5-.5"/>
-      </svg>
+      <div class="job-logo">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="job-logo" viewBox="0 0 16 16">
+          <path d="M6.5 1A1.5 1.5 0 0 0 5 2.5V3H1.5A1.5 1.5 0 0 0 0 4.5v8A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-8A1.5 1.5 0 0 0 14.5 3H11v-.5A1.5 1.5 0 0 0 9.5 1zm0 1h3a.5.5 0 0 1 .5.5V3H6v-.5a.5.5 0 0 1 .5-.5m1.886 6.914L15 7.151V12.5a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5V7.15l6.614 1.764a1.5 1.5 0 0 0 .772 0M1.5 4h13a.5.5 0 0 1 .5.5v1.616L8.129 7.948a.5.5 0 0 1-.258 0L1 6.116V4.5a.5.5 0 0 1 .5-.5"/>
+        </svg>
+      </div>
       <div class="job-text">
-        <span class="job-title copyable-job-field" data-copy-content="${job.title}">${job.title}</span>`;
+        <span class="job-title copyable-job-field" data-copy-content="${job.employer}">${job.employer}</span>`;
         
     // Only add employer if it exists
     if (job.employer) {
-      jobHTML += `<span class="job-employer copyable-job-field" data-copy-content="${job.employer}">${job.employer}</span>`;
+      jobHTML += `<span class="job-employer copyable-job-field" data-copy-content="${job.title}">${job.title}</span>`;
     }
     
     jobHTML += `<span class="job-url copyable-job-field" data-copy-content="${job.url}">${job.url}</span>`;
@@ -469,11 +504,127 @@ Best regards,
     const currentUrl = await this.getCurrentTabUrl();
     this.jobUrlInput.value = currentUrl || '';
     
+    // Check if this is a LinkedIn job page and extract job title and employer if it is
+    if (currentUrl && currentUrl.includes('linkedin.com/jobs/view')) {
+      try {
+        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+        if (tab && tab.id) {
+          // Execute script to extract job title and employer from LinkedIn page
+          const results = await chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            func: () => {
+              let jobTitle = '';
+              let companyName = '';
+              
+              // Extract job title
+              try {
+                const titleElement = document.querySelector('h1.t-24, h1.job-title, h1[data-test-job-title], h1');
+                if (titleElement && titleElement.textContent) {
+                  jobTitle = titleElement.textContent.trim();
+                  console.log("Found job title:", jobTitle);
+                }
+              } catch(titleError) {
+                console.error("Error finding job title:", titleError);
+              }
+              
+              // Extract company name - improved to handle more LinkedIn layouts
+              try {
+                // Try multiple possible selectors for company name with detailed logging
+                const companySelectors = [
+                  // New LinkedIn selectors
+                  'a[data-tracking-control-name="public_jobs_topcard-org-name"]',
+                  'span.jobs-unified-top-card__company-name',
+                  'a.jobs-unified-top-card__company-name',
+                  
+                  // Traditional selectors
+                  'a.company-name',
+                  'a[data-test-company-name]',
+                  'span.company-name',
+                  'span[data-test-company-name]',
+                  'div.company-name',
+                  'div[data-test-company-name]',
+                  
+                  // General fallback selectors that might contain company name
+                  '.jobs-unified-top-card__subtitle-primary-grouping a',
+                  '.jobs-unified-top-card__company-name a',
+                  '.job-details-jobs-unified-top-card__company-name'
+                ];
+                
+                console.log("Looking for company name with various selectors...");
+                let companyElement = null;
+                
+                for (const selector of companySelectors) {
+                  companyElement = document.querySelector(selector);
+                  if (companyElement && companyElement.textContent) {
+                    console.log(`Found company element with selector: ${selector}`);
+                    break;
+                  }
+                }
+                
+                // If we still don't have it, try a more aggressive approach
+                if (!companyElement || !companyElement.textContent.trim()) {
+                  console.log("Trying secondary approach for company name...");
+                  
+                  // Look for elements in the subtitle area that might contain the company name
+                  const subtitleElements = document.querySelectorAll('.jobs-unified-top-card__subtitle-primary-grouping a, .job-details-jobs-unified-top-card__primary-description-container a');
+                  for (let i = 0; i < subtitleElements.length; i++) {
+                    const element = subtitleElements[i];
+                    // Typically the company name is the first link in these sections
+                    if (element && element.textContent && !element.textContent.includes('followers') && !element.textContent.includes('reviews')) {
+                      companyElement = element;
+                      console.log("Found company name in subtitle element:", companyElement.textContent.trim());
+                      break;
+                    }
+                  }
+                }
+                
+                if (companyElement && companyElement.textContent) {
+                  companyName = companyElement.textContent.trim();
+                  // Clean up common patterns in LinkedIn company names
+                  companyName = companyName.replace(/\s*\([^)]*\)/, ''); // Remove content in parentheses
+                  companyName = companyName.replace(/\d+,?\d*\s*followers/, ''); // Remove "X followers"
+                  companyName = companyName.trim();
+                  console.log("Found company name:", companyName);
+                } else {
+                  console.log("Could not find company name with any selector");
+                }
+              } catch(companyError) {
+                console.error("Error finding company name:", companyError);
+              }
+              
+              return { jobTitle, companyName };
+            }
+          });
+          
+          // Update form fields if data was extracted
+          if (results && results[0] && results[0].result) {
+            const { jobTitle, companyName } = results[0].result;
+            
+            if (jobTitle) {
+              this.jobTitleInput.value = jobTitle;
+              console.log("Populated job title:", jobTitle);
+            }
+            
+            if (companyName) {
+              this.jobEmployerInput.value = companyName;
+              console.log("Populated employer name:", companyName);
+            } else {
+              console.log("Failed to extract company name");
+            }
+          } else {
+            console.log("No data extracted from LinkedIn page");
+          }
+        }
+      } catch(error) {
+        console.error("Error extracting job data from LinkedIn:", error);
+      }
+    }
+    
     // Show modal
     this.jobModalOverlay.classList.add('show');
     
     // Focus on title field
-    setTimeout(() => this.jobTitleInput.focus(), 100);
+    setTimeout(() => this.jobEmployerInput.focus(), 100);
   },
   
   closeJobModal() {
@@ -491,15 +642,23 @@ Best regards,
     const employer = this.jobEmployerInput.value.trim();
     const url = this.jobUrlInput.value.trim();
     const dateApplied = this.jobDateAppliedInput.value.trim();
-    
+
+    if (!employer) {
+      showInputError(this.jobEmployerInput, 'Please enter the employer name');
+      this.jobEmployerInput.focus();
+      return;
+    }
+
     if (!title) {
-      alert('Please enter a job title.');
+      showInputError(this.jobTitleInput, 'Please enter the job title');
+      this.jobTitleInput.focus();
       return;
     }
     
     if (!url) {
-      alert('Please enter a job URL.');
-      return;
+        showInputError(this.jobUrlInput, 'Please enter a job URL');
+        this.jobUrlInput.focus();
+        return;
     }
     
     const newJob = {
@@ -511,7 +670,8 @@ Best regards,
       dateAdded: new Date().toISOString()
     };
     
-    this.currentJobs.push(newJob);
+    // Add new job to the beginning of the array instead of the end
+    this.currentJobs.unshift(newJob);
     
     try {
       await chrome.storage.local.set({ [this.JOBS_KEY]: this.currentJobs });
@@ -1048,5 +1208,90 @@ Best regards,
       e.preventDefault();
       this.saveJob();
     }
-  }
+  },
+
+  // Toggle job sort menu visibility
+  toggleJobSortMenu(event) {
+    event.stopPropagation();
+    this.sortJobsMenu.classList.toggle('active');
+    
+    // Update active class on the current sort option
+    this.updateActiveJobSortOption();
+  },
+  
+  // Handle job sort option click
+  handleJobSortOptionClick(sortValue) {
+    // Set current sort option
+    this.currentJobSortOption = sortValue;
+    
+    // Hide the menu
+    this.sortJobsMenu.classList.remove('active');
+    
+    // Update active state on options
+    this.updateActiveJobSortOption();
+    
+    // Sort and reload jobs with new sort order
+    this.sortAndRenderJobs();
+  },
+  
+  // Handle clicks outside the job sort menu
+  handleJobClickOutside(event) {
+    if (this.sortJobsMenu && this.sortJobsMenu.classList.contains('active') && 
+        event.target !== this.sortJobsButton && 
+        !this.sortJobsMenu.contains(event.target)) {
+      this.sortJobsMenu.classList.remove('active');
+    }
+  },
+  
+  // Update which job sort option is marked as active
+  updateActiveJobSortOption() {
+    if (this.sortJobOptions) {
+      this.sortJobOptions.forEach(option => {
+        const sortValue = option.getAttribute('data-sort');
+        if (sortValue === this.currentJobSortOption) {
+          option.classList.add('active');
+        } else {
+          option.classList.remove('active');
+        }
+      });
+    }
+  },
+
+  // Sort jobs based on the selected option
+  sortJobs(jobs, sortOption) {
+    console.log("Sorting jobs by:", sortOption);
+    switch(sortOption) {
+      case 'employer':
+        // Put jobs with no employer at the bottom
+        return [...jobs].sort((a, b) => {
+          if (!a.employer && !b.employer) return 0;
+          if (!a.employer) return 1;
+          if (!b.employer) return -1;
+          return a.employer.localeCompare(b.employer);
+        });
+      case 'recent':
+      default:
+        // Sort by dateAdded (most recent first)
+        return [...jobs].sort((a, b) => {
+          if (a.dateAdded && b.dateAdded) {
+            return new Date(b.dateAdded) - new Date(a.dateAdded);
+          } else if (a.dateAdded) {
+            return -1;
+          } else if (b.dateAdded) {
+            return 1;
+          }
+          return 0;
+        });
+    }
+  },
+  
+  // Sort and render jobs
+  sortAndRenderJobs() {
+    // Sort jobs based on current sort option
+    const sortedJobs = this.sortJobs(this.currentJobs, this.currentJobSortOption);
+    this.currentJobs = sortedJobs;
+    
+    // Re-render the job list
+    this.renderJobItems();
+  },
 };

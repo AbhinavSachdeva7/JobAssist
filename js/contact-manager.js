@@ -1,5 +1,7 @@
+import { showInputError } from './form-utils.js';
+
 // Contact Manager Module
-const ContactManager = {
+export const ContactManager = {
   STORAGE_KEY: 'jobAppHelperContacts',
   
   init() {
@@ -17,6 +19,9 @@ const ContactManager = {
     this.contactReachedOutInput = document.getElementById('contact-reached-out');
     this.contactsListDiv = document.getElementById('contacts-list');
     this.downloadContactsButton = document.getElementById('download-contacts-button');
+    this.sortContactsButton = document.getElementById('sort-contacts-button');
+    this.sortMenu = document.getElementById('sort-menu');
+    this.sortOptions = document.querySelectorAll('.sort-option');
     
     // Log the DOM elements to debug
     console.log("DOM elements:", {
@@ -26,8 +31,14 @@ const ContactManager = {
       saveBtn: this.saveContactButton,
       cancelBtn: this.cancelContactButton,
       contactsList: this.contactsListDiv,
-      downloadBtn: this.downloadContactsButton
+      downloadBtn: this.downloadContactsButton,
+      sortBtn: this.sortContactsButton,
+      sortMenu: this.sortMenu,
+      sortOptions: this.sortOptions
     });
+    
+    // Current sort option (default to most recent)
+    this.currentSortOption = 'recent';
     
     // Bind methods to preserve context
     this.handleAddContact = this.handleAddContact.bind(this);
@@ -35,6 +46,9 @@ const ContactManager = {
     this.closeContactModal = this.closeContactModal.bind(this);
     this.toggleReachedOutStatus = this.toggleReachedOutStatus.bind(this);
     this.downloadContactsData = this.downloadContactsData.bind(this);
+    this.toggleSortMenu = this.toggleSortMenu.bind(this);
+    this.handleSortOptionClick = this.handleSortOptionClick.bind(this);
+    this.handleClickOutside = this.handleClickOutside.bind(this);
     // Removed handleCancelContact binding as we're using closeContactModal instead
     
     // Set up event listeners
@@ -63,6 +77,24 @@ const ContactManager = {
     if (this.downloadContactsButton) {
       this.downloadContactsButton.addEventListener('click', this.downloadContactsData);
     }
+    
+    // Sort contacts button event listener
+    if (this.sortContactsButton) {
+      this.sortContactsButton.addEventListener('click', this.toggleSortMenu);
+    }
+    
+    // Add click listeners for sort options
+    if (this.sortOptions) {
+      this.sortOptions.forEach(option => {
+        option.addEventListener('click', () => {
+          const sortValue = option.getAttribute('data-sort');
+          this.handleSortOptionClick(sortValue);
+        });
+      });
+    }
+    
+    // Add global click listener to close the sort menu when clicking outside
+    document.addEventListener('click', this.handleClickOutside);
     
     // Add keydown listeners for Enter key in inputs
     const contactInputs = [
@@ -98,7 +130,7 @@ const ContactManager = {
     console.log("Loading contacts...");
     try {
       const result = await chrome.storage.local.get(this.STORAGE_KEY);
-      const savedContacts = result[this.STORAGE_KEY] || [];
+      let savedContacts = result[this.STORAGE_KEY] || [];
       console.log("Found contacts:", savedContacts);
       
       if (!this.contactsListDiv) {
@@ -112,12 +144,90 @@ const ContactManager = {
         this.contactsListDiv.innerHTML = '<p>No contacts saved yet.</p>';
         return;
       }
+
+      // Apply sorting based on the current selection
+      savedContacts = this.sortContacts(savedContacts, this.currentSortOption);
       
       savedContacts.forEach(contact => {
         this.displayContact(contact.name, contact.email, contact.employer, contact.url, contact.reachedOut);
       });
     } catch (error) {
       console.error("Error loading contacts:", error);
+    }
+  },
+
+  // Toggle sort menu visibility
+  toggleSortMenu(event) {
+    event.stopPropagation();
+    this.sortMenu.classList.toggle('active');
+    
+    // Update active class on the current sort option
+    this.updateActiveSortOption();
+  },
+  
+  // Handle sort option click
+  handleSortOptionClick(sortValue) {
+    // Set current sort option
+    this.currentSortOption = sortValue;
+    
+    // Hide the menu
+    this.sortMenu.classList.remove('active');
+    
+    // Update active state on options
+    this.updateActiveSortOption();
+    
+    // Reload contacts with new sort
+    this.loadContacts();
+  },
+  
+  // Handle clicks outside the sort menu
+  handleClickOutside(event) {
+    if (this.sortMenu && this.sortMenu.classList.contains('active') && 
+        event.target !== this.sortContactsButton && 
+        !this.sortMenu.contains(event.target)) {
+      this.sortMenu.classList.remove('active');
+    }
+  },
+  
+  // Update which sort option is marked as active
+  updateActiveSortOption() {
+    this.sortOptions.forEach(option => {
+      const sortValue = option.getAttribute('data-sort');
+      if (sortValue === this.currentSortOption) {
+        option.classList.add('active');
+      } else {
+        option.classList.remove('active');
+      }
+    });
+  },
+
+  // Sort contacts based on the selected option
+  sortContacts(contacts, sortOption) {
+    console.log("Sorting contacts by:", sortOption);
+    switch(sortOption) {
+      case 'name':
+        return [...contacts].sort((a, b) => a.name.localeCompare(b.name));
+      case 'employer':
+        // Put contacts with no employer at the bottom
+        return [...contacts].sort((a, b) => {
+          if (!a.employer && !b.employer) return 0;
+          if (!a.employer) return 1;
+          if (!b.employer) return -1;
+          return a.employer.localeCompare(b.employer);
+        });
+      case 'recent':
+      default:
+        // Sort by timestamp if available, otherwise keep original order
+        return [...contacts].sort((a, b) => {
+          if (a.timestamp && b.timestamp) {
+            return b.timestamp - a.timestamp;
+          } else if (a.timestamp) {
+            return -1;
+          } else if (b.timestamp) {
+            return 1;
+          }
+          return 0;
+        });
     }
   },
   
@@ -129,15 +239,12 @@ const ContactManager = {
     }
 
     const contactDiv = document.createElement('div');
+    contactDiv.className = 'contact-item';
     contactDiv.setAttribute('data-contact-email', email);
+
+    contactDiv.style.backgroundColor = "var(--background-light)";
     
-    // Add inline styles to ensure no border or shadow appears, with a light background color
-    contactDiv.style.padding = '16px';
-    contactDiv.style.marginBottom = '12px';
-    contactDiv.style.borderRadius = '10px';
-    contactDiv.style.backgroundColor = '#f9f5ff'; // Light purple background for better visibility
-    contactDiv.style.boxShadow = '0 1px 4px rgba(0, 0, 0, 0.05)';
-    contactDiv.style.border = 'none';
+    
     
     // Create reached out status HTML with appropriate styling based on status
     const reachedOutStatusHTML = `
@@ -190,7 +297,7 @@ const ContactManager = {
 
     // Set up delete button listener
     contactDiv.querySelector('.delete-button').addEventListener('click', (e) => {
-      const emailToDelete = e.target.getAttribute('data-email');
+      const emailToDelete = e.currentTarget.getAttribute('data-email');
       this.deleteContact(emailToDelete);
     });
 
@@ -299,7 +406,11 @@ const ContactManager = {
       reachedOut = this.contactReachedOutInput.checked;
     }
 
-    contacts.push({ name, email, employer, url, reachedOut });
+    // Add timestamp to track when contact was added
+    const timestamp = Date.now();
+
+    // Add new contact at the beginning of the array
+    contacts.unshift({ name, email, employer, url, reachedOut, timestamp });
     await chrome.storage.local.set({ [this.STORAGE_KEY]: contacts });
     this.showToast('Contact saved successfully!');
     return true;
@@ -525,6 +636,7 @@ const ContactManager = {
     if (this.contactEmployerInput) this.contactEmployerInput.value = '';
     if (this.contactUrlInput) this.contactUrlInput.value = '';
   },
+
   
   async handleAddContact() {
     const name = this.contactNameInput.value.trim();
@@ -532,28 +644,29 @@ const ContactManager = {
     const employer = this.contactEmployerInput.value.trim();
     const url = this.contactUrlInput.value.trim();
 
-    // Basic validation
+    // Basic validation with visual feedback
     if (!name) {
-      this.showToast('Please enter a name', 'error');
+      showInputError(this.contactNameInput, 'Please enter a name');
       this.contactNameInput.focus();
       return;
     }
     
     if (!email || !email.includes('@') || !email.includes('.')) {
-      this.showToast('Please enter a valid email address', 'error');
+      showInputError(this.contactEmailInput, 'Please enter a valid email address');
       this.contactEmailInput.focus();
       return;
     }
 
     const saved = await this.saveContact(name, email, employer, url);
-    if (saved) {
-      this.displayContact(name, email, employer, url);
-      
+  if (saved) {
       // Close the modal
       this.closeContactModal();
       
       // Show the contact saved animation
       this.showContactSavedAnimation();
+
+      // Reload contacts to show the newly added contact at the top (if sorted by recent)
+      this.loadContacts();
     }
   },
   
